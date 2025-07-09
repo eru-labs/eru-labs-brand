@@ -45,8 +45,8 @@ const Footer = () => {
       title: 'Community',
       icon: Users,
       links: [
-        { name: 'Discord', href: '#discord', external: true },
-        { name: 'Twitter', href: '#twitter', external: true },
+        { name: 'IRC', href: '#irc', external: true },
+        { name: 'Bluesky', href: '#bluesky', external: true },
         { name: 'Newsletter', href: '#newsletter' },
         { name: 'Events', href: '#events' },
         { name: 'Forum', href: '#forum' }
@@ -58,7 +58,6 @@ const Footer = () => {
       links: [
         { name: 'About Us', href: '#about' },
         { name: 'Careers', href: '#careers', badge: '3 openings' },
-        { name: 'Press Kit', href: '#press' },
         { name: 'Contact', href: '#contact' },
         { name: 'Privacy Policy', href: '#privacy' }
       ]
@@ -117,7 +116,7 @@ const Footer = () => {
             </p>
             <div className="flex items-center space-x-2 text-sm text-gray-400">
               <MapPin className="w-4 h-4" />
-              <span>San Francisco, CA</span>
+              <span>Brooklyn, NY</span>
             </div>
           </div>
 
@@ -153,39 +152,6 @@ const Footer = () => {
               </div>
             );
           })}
-        </div>
-
-        {/* Recent Publications */}
-        <div className="border-t border-gray-800 pt-8 mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="text-white font-semibold flex items-center">
-              <BookOpen className="w-5 h-5 mr-2 text-indigo-400" />
-              Recent Publications
-            </h4>
-            <a href="#publications" className="text-indigo-400 hover:text-indigo-300 text-sm">
-              View all →
-            </a>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <a href="#" className="group p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-all duration-300">
-              <h5 className="text-white font-medium group-hover:text-indigo-400 transition-colors line-clamp-2">
-                Peer Pressure in Multi-Agent Systems: A Novel Approach
-              </h5>
-              <p className="text-gray-400 text-sm mt-1">March 2024 • 569 downloads</p>
-            </a>
-            <a href="#" className="group p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-all duration-300">
-              <h5 className="text-white font-medium group-hover:text-indigo-400 transition-colors line-clamp-2">
-                Emergent Collaboration Patterns in Agent Networks
-              </h5>
-              <p className="text-gray-400 text-sm mt-1">February 2024 • 342 downloads</p>
-            </a>
-            <a href="#" className="group p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-all duration-300">
-              <h5 className="text-white font-medium group-hover:text-indigo-400 transition-colors line-clamp-2">
-                Scaling Multi-Agent Orchestration in Production
-              </h5>
-              <p className="text-gray-400 text-sm mt-1">January 2024 • 891 downloads</p>
-            </a>
-          </div>
         </div>
 
         {/* Bottom Section */}
