@@ -115,29 +115,33 @@ export default function Hero() {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center gradient-bg overflow-hidden">
-      {/* Animated background particles */}
-      <div className="absolute inset-0">
-        {[...Array(50)].map((_, i) => (
-          <motion.div
+    {/* Animated background particles */}
+    <div className="absolute inset-0">
+        {[...Array(150)].map((_, i) => (
+        <motion.div
             key={i}
             className="absolute w-1 h-1 bg-green-500 rounded-full"
             initial={{
-              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
-              y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
-              opacity: Math.random(),
+            x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+            y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
+            opacity: Math.random() * 0.8 + 0.2, // More visible particles
             }}
             animate={{
-              y: [null, -100],
-              opacity: [null, 0],
+            y: [null, -100],
+            opacity: [null, 0],
             }}
             transition={{
-              duration: Math.random() * 10 + 10,
-              repeat: Infinity,
-              ease: 'linear',
+            duration: Math.random() * 15 + 5, // Varied speeds
+            repeat: Infinity,
+            ease: 'linear',
+            delay: Math.random() * 2, // Stagger start times
             }}
-          />
+            style={{
+            willChange: 'transform, opacity', // Optimize for animations
+            }}
+        />
         ))}
-      </div>
+    </div>
 
       <div className="container mx-auto px-6 relative z-10">
         <motion.div

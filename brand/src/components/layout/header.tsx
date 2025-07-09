@@ -77,8 +77,8 @@ const Header = () => {
                 <Image 
                   src="/img/logo.png" 
                   alt="Eru Labs Logo" 
-                  width={90} 
-                  height={90} 
+                  width={80} 
+                  height={80} 
                   priority={true}
                   className={`object-contain transition-all duration-300 ${
                     isScrolled 

@@ -5,7 +5,7 @@ const TeamSection = () => {
   const team = [
     {
       name: "knots",
-      role: "Founder/Researcher/Nerd",
+      role: "Founder",
       bio: "Emmy Award winning Engineering Leader spear heading research and development",
       image: "img/knots.jpeg",
       social: {
@@ -17,7 +17,7 @@ const TeamSection = () => {
     },
     {
       name: "chazapp",
-      role: "SRE/SWE",
+      role: "Contributor",
       bio: "have chazapp fill this out",
       image: "img/chaz.png",
       social: {
@@ -28,8 +28,8 @@ const TeamSection = () => {
       }
     },
     {
-      name: "Umbra",
-      role: "SRE/SWE",
+      name: "umbra",
+      role: "Contributor",
       bio: "have Umbra fill this out",
       image: "img/umbra.jpeg",
       social: {
@@ -39,10 +39,22 @@ const TeamSection = () => {
       }
     },
     {
-      name: "Gavisann",
-      role: "SRE/SWE",
+      name: "nullaffinity",
+      role: "Contributor",
+      bio: "have null fill this out",
+      image: "img/nullaffinity.png",
+      social: {
+        github: "https://github.com/null-affinity",
+        linkedin: "#",
+        twitter: "#",
+        email: "nullaffinity@erulabs.ai"
+      }
+    },
+    {
+      name: "gavisann",
+      role: "Contributor",
       bio: "have gavisann fill this out",
-      image: "img/r.jpeg",
+      image: "img/gavisann.jpeg",
       social: {
         github: "https://github.com/RLProteus",
         linkedin: "#",
@@ -66,7 +78,7 @@ const TeamSection = () => {
             Meet Our Research Team
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Passionate researchers and engineers working at the intersection of 
+            Passionate hackers, researchers and engineers working at the intersection of 
             multi-agent systems, AI orchestration, and emergent behaviors
           </p>
         </div>
