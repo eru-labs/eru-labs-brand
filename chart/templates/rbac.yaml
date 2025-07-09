@@ -1,0 +1,26 @@
+{{- if .Values.rbac.enabled }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: eru-brand-role
+  namespace: {{ .Release.Namespace }}
+rules:
+  # add rules in here as needed. this is a place holder for now
+
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: eru-brand-rolebinding
+  namespace: {{ .Release.Namespace }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "eru-brand.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  name: eru-brand-role
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}
