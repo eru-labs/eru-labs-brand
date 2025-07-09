@@ -1,28 +1,15 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  // Enable standalone output for Docker builds
   output: 'standalone',
-  reactStrictMode: true,
-  images: {
-    domains: ['localhost', 'erulabs.ai'],
-  },
+  
+  // Enable experimental features if needed
   experimental: {
-    serverActions: {
-      bodySizeLimit: '2mb',
-    },
+    // Add any experimental features here
   },
-  async headers() {
-    return [
-      {
-        source: '/api/:path*',
-        headers: [
-          { key: 'Access-Control-Allow-Credentials', value: 'true' },
-          { key: 'Access-Control-Allow-Origin', value: '*' },
-          { key: 'Access-Control-Allow-Methods', value: 'GET,DELETE,PATCH,POST,PUT' },
-          { key: 'Access-Control-Allow-Headers', value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version' },
-        ],
-      },
-    ];
-  },
+  
+  /* other config options here */
 };
 
-module.exports = nextConfig;
+export default nextConfig;
