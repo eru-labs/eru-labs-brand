@@ -34,7 +34,7 @@ const Footer = () => {
       title: 'Open Source',
       icon: Code,
       links: [
-        { name: 'GitHub', href: 'https://github.com/erulabs', external: true },
+        { name: 'GitHub', href: 'https://github.com/eru-labs', external: true },
         { name: 'Projects', href: '#projects' },
         { name: 'Contributing', href: '#contributing' },
         { name: 'Documentation', href: '#docs' },
@@ -66,10 +66,10 @@ const Footer = () => {
   };
 
   const socialLinks = [
-    { icon: Github, href: 'https://github.com/erulabs', label: 'GitHub' },
-    { icon: Twitter, href: 'https://twitter.com/erulabs', label: 'Twitter' },
-    { icon: Linkedin, href: 'https://linkedin.com/company/erulabs', label: 'LinkedIn' },
-    { icon: Mail, href: 'mailto:hello@erulabs.ai', label: 'Email' }
+    { icon: Github, href: 'https://github.com/eru-labs', label: 'GitHub' },
+    { icon: Twitter, href: 'https://bluesky.com/eru-labs', label: 'bluesky' },
+    { icon: Linkedin, href: 'https://linkedin.com/company/eru-labs', label: 'LinkedIn' },
+    { icon: Mail, href: 'mailto:info@erulabs.ai', label: 'Email' }
   ];
 
   return (

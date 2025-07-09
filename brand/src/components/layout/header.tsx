@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Github, Brain, ChevronDown } from 'lucide-react';
+import { Menu, X, Github, ChevronDown } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -68,22 +70,29 @@ const Header = () => {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex items-center">
-            <a href="/" className="flex items-center space-x-3 group">
-              <div className={`p-2 rounded-xl transition-all duration-300 ${
-                isScrolled 
-                  ? 'bg-indigo-600 group-hover:bg-indigo-700' 
-                  : 'bg-white/10 backdrop-blur-sm group-hover:bg-white/20'
+            <Link href="/" className="flex items-center space-x-3 group">
+              <div className={`relative transition-all duration-300 ${
+                isScrolled ? 'opacity-100' : 'opacity-90 group-hover:opacity-100'
               }`}>
-                <Brain className={`w-6 h-6 ${
-                  isScrolled ? 'text-white' : 'text-indigo-600'
-                }`} />
+                <Image 
+                  src="/img/logo.png" 
+                  alt="Eru Labs Logo" 
+                  width={90} 
+                  height={90} 
+                  priority={true}
+                  className={`object-contain transition-all duration-300 ${
+                    isScrolled 
+                      ? 'brightness-100 invert' 
+                      : 'brightness-110 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]'
+                  }`}
+                />
               </div>
               <span className={`text-xl font-bold transition-colors duration-300 ${
                 isScrolled ? 'text-gray-900' : 'text-white'
               }`}>
                 Eru Labs
               </span>
-            </a>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
@@ -132,7 +141,7 @@ const Header = () => {
             
             {/* GitHub Link */}
             <a
-              href="https://github.com/erulabs"
+              href="https://github.com/eru-labs"
               className={`ml-4 flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
                 isScrolled
                   ? 'bg-gray-900 text-white hover:bg-gray-800'
@@ -192,7 +201,7 @@ const Header = () => {
               ))}
               
               <a
-                href="https://github.com/erulabs"
+                href="https://github.com/eru-labs"
                 className="flex items-center justify-center px-4 py-3 mt-4 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >

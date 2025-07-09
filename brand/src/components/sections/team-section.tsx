@@ -4,47 +4,47 @@ import { Github, Linkedin, Twitter, Mail } from 'lucide-react';
 const TeamSection = () => {
   const team = [
     {
-      name: "Dr. Sarah Chen",
-      role: "Principal Research Scientist",
-      bio: "Leading research in multi-agent orchestration and emergent behaviors in AI systems",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
+      name: "knots",
+      role: "Founder/Researcher/Nerd",
+      bio: "Emmy Award winning Engineering Leader spear heading research and development",
+      image: "img/knots.jpeg",
       social: {
-        github: "#",
+        github: "https://github.com/im-knots",
         linkedin: "#",
         twitter: "#",
-        email: "sarah@erulabs.ai"
+        email: "knots@erulabs.ai"
       }
     },
     {
-      name: "Alex Kumar",
-      role: "Senior AI Engineer",
-      bio: "Specializing in production-scale AI systems and distributed agent architectures",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
+      name: "chazapp",
+      role: "SRE/SWE",
+      bio: "have chazapp fill this out",
+      image: "img/chaz.png",
       social: {
-        github: "#",
+        github: "https://github.com/chazapp",
         linkedin: "#",
         twitter: "#",
-        email: "alex@erulabs.ai"
+        email: "chazapp@erulabs.ai"
       }
     },
     {
-      name: "Dr. Maria Rodriguez",
-      role: "Research Scientist",
-      bio: "Investigating peer pressure dynamics in multi-agent systems and collaborative AI",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
+      name: "Umbra",
+      role: "SRE/SWE",
+      bio: "have Umbra fill this out",
+      image: "img/umbra.jpeg",
       social: {
-        github: "#",
+        github: "https://github.com/umbra-tech",
         linkedin: "#",
-        email: "maria@erulabs.ai"
+        email: "umbra@erulabs.ai"
       }
     },
     {
-      name: "James Thompson",
-      role: "Machine Learning Engineer",
-      bio: "Building scalable infrastructure for agent-based AI research and experimentation",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
+      name: "Gavisann",
+      role: "SRE/SWE",
+      bio: "have gavisann fill this out",
+      image: "img/r.jpeg",
       social: {
-        github: "#",
+        github: "https://github.com/RLProteus",
         linkedin: "#",
         twitter: "#"
       }
