@@ -113,7 +113,7 @@ export default function Publications() {
   }
 
   return (
-    <section className="py-20 bg-gray-950">
+    <section id="publications" className="py-20 bg-gray-950">
       <div className="container mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
