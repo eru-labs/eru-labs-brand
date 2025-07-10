@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "siteName": "Eru Labs",
+    "siteName": "ERU Labs",
     "description": "Advanced AI research lab focused on emergent behaviors and multi-agent systems",
     "version": "1.0.0"
   },
@@ -62,5 +62,99 @@
       "customDescription": "This is Your AI on Peer Pressure: An Observational Study of Inter-Agent Social Dynamics",
       "githubUrl": "https://github.com/im-knots/the-academy"
     }
-  ]
+  ],
+  "team": {
+    "title": "Meet Our Team",
+    "description": "Passionate hackers, researchers and engineers working at the intersection of multi-agent systems, AI orchestration, and emergent behaviors",
+    "members": [
+      {
+        "name": "knots",
+        "role": "Founder",
+        "bio": "Emmy Award winning Engineering Leader spearheading research and development",
+        "image": "img/knots.jpeg",
+        "social": {
+          "github": "https://github.com/im-knots",
+          "linkedin": "#",
+          "twitter": "#",
+          "email": "knots@erulabs.ai"
+        }
+      },
+      {
+        "name": "chazapp",
+        "role": "Contributor",
+        "bio": "have chazapp fill this out",
+        "image": "img/chaz.png",
+        "social": {
+          "github": "https://github.com/chazapp",
+          "linkedin": "#",
+          "twitter": "#",
+          "email": "chazapp@erulabs.ai"
+        }
+      },
+      {
+        "name": "umbra",
+        "role": "Contributor",
+        "bio": "have Umbra fill this out",
+        "image": "img/umbra.jpeg",
+        "social": {
+          "github": "https://github.com/umbra-tech",
+          "linkedin": "#",
+          "email": "umbra@erulabs.ai"
+        }
+      },
+      {
+        "name": "nullaffinity",
+        "role": "Contributor",
+        "bio": "have null fill this out",
+        "image": "img/nullaffinity.png",
+        "social": {
+          "github": "https://github.com/null-affinity",
+          "linkedin": "#",
+          "twitter": "#",
+          "email": "nullaffinity@erulabs.ai"
+        }
+      },
+      {
+        "name": "mobomelter",
+        "role": "Contributor",
+        "bio": "have mobomelter fill this out",
+        "image": "img/mobomelter.jpeg",
+        "social": {
+          "github": "https://github.com/mobomelter",
+          "linkedin": "#",
+          "twitter": "#",
+          "email": "mobomelter@erulabs.ai"
+        }
+      },
+      {
+        "name": "sesquisentient",
+        "role": "Contributor",
+        "bio": "have ses fill this out",
+        "image": "img/sesquisentient.png",
+        "social": {
+          "github": "#",
+          "linkedin": "#",
+          "twitter": "#",
+          "email": "sesquisentient@erulabs.ai"
+        }
+      },
+      {
+        "name": "gavisann",
+        "role": "Contributor",
+        "bio": "have gavisann fill this out",
+        "image": "img/gavisann.jpeg",
+        "social": {
+          "github": "https://github.com/RLProteus",
+          "linkedin": "#",
+          "twitter": "#",
+          "email": "gavisann@erulabs.ai"
+        }
+      }
+    ],
+    "callToAction": {
+      "text": "Interested in joining the collective?",
+      "linkText": "We need you →",
+      "linkUrl": "#careers"
+    }
+  }
 }

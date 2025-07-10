@@ -34,6 +34,27 @@ export interface SiteConfig {
     docsUrl?: string;
     githubUrl?: string;
   }>;
+  team: {
+    title: string;
+    description: string;
+    members: Array<{
+      name: string;
+      role: string;
+      bio: string;
+      image: string;
+      social: {
+        github?: string;
+        linkedin?: string;
+        twitter?: string;
+        email?: string;
+      };
+    }>;
+    callToAction: {
+      text: string;
+      linkText: string;
+      linkUrl: string;
+    };
+  };
 }
 
 let cachedConfig: SiteConfig | null = null;
@@ -118,7 +139,30 @@ export function getDefaultConfig(): SiteConfig {
         customDescription: "This is Your AI on Peer Pressure: An Observational Study of Inter-Agent Social Dynamics",
         githubUrl: "https://github.com/im-knots/the-academy"
       }
-    ]
+    ],
+    team: {
+      title: "Meet Our Team",
+      description: "Passionate hackers, researchers and engineers working at the intersection of multi-agent systems, AI orchestration, and emergent behaviors",
+      members: [
+        {
+          name: "knots",
+          role: "Founder",
+          bio: "Emmy Award winning Engineering Leader spearheading research and development",
+          image: "img/knots.jpeg",
+          social: {
+            github: "https://github.com/im-knots",
+            linkedin: "#",
+            twitter: "#",
+            email: "knots@erulabs.ai"
+          }
+        }
+      ],
+      callToAction: {
+        text: "Interested in joining the collective?",
+        linkText: "We need you →",
+        linkUrl: "#careers"
+      }
+    }
   };
 }
 

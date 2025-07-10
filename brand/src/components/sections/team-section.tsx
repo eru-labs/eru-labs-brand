@@ -1,80 +1,10 @@
+// File: src/components/sections/team-section.tsx
 import React from 'react';
-import { Github, Linkedin, Twitter, Mail } from 'lucide-react';
+import { Github, Linkedin, Twitter, Mail, Loader2 } from 'lucide-react';
+import { useERULabsData } from '../providers/data-provider';
 
 const TeamSection = () => {
-  const team = [
-    {
-      name: "knots",
-      role: "Founder",
-      bio: "Emmy Award winning Engineering Leader spearheading research and development",
-      image: "img/knots.jpeg",
-      social: {
-        github: "https://github.com/im-knots",
-        linkedin: "#",
-        twitter: "#",
-        email: "knots@erulabs.ai"
-      }
-    },
-    {
-      name: "chazapp",
-      role: "Contributor",
-      bio: "have chazapp fill this out",
-      image: "img/chaz.png",
-      social: {
-        github: "https://github.com/chazapp",
-        linkedin: "#",
-        twitter: "#",
-        email: "chazapp@erulabs.ai"
-      }
-    },
-    {
-      name: "umbra",
-      role: "Contributor",
-      bio: "have Umbra fill this out",
-      image: "img/umbra.jpeg",
-      social: {
-        github: "https://github.com/umbra-tech",
-        linkedin: "#",
-        email: "umbra@erulabs.ai"
-      }
-    },
-    {
-      name: "nullaffinity",
-      role: "Contributor",
-      bio: "have null fill this out",
-      image: "img/nullaffinity.png",
-      social: {
-        github: "https://github.com/null-affinity",
-        linkedin: "#",
-        twitter: "#",
-        email: "nullaffinity@erulabs.ai"
-      }
-    },
-    {
-      name: "mobomelter",
-      role: "Contributor",
-      bio: "have mobomelter fill this out",
-      image: "img/mobomelter.jpeg",
-      social: {
-        github: "https://github.com/mobomelter",
-        linkedin: "#",
-        twitter: "#",
-        email: "mobomelter@erulabs.ai"
-      }
-    },
-    {
-      name: "gavisann",
-      role: "Contributor",
-      bio: "have gavisann fill this out",
-      image: "img/gavisann.jpeg",
-      social: {
-        github: "https://github.com/RLProteus",
-        linkedin: "#",
-        twitter: "#",
-        email: "gavisann@erulabs.ai"
-      }
-    }
-  ];
+  const { config, loading, error } = useERULabsData();
 
   const socialIcons = {
     github: Github,
@@ -83,21 +13,54 @@ const TeamSection = () => {
     email: Mail
   };
 
+  if (loading) {
+    return (
+      <section className="py-24 bg-gradient-to-b from-gray-50 to-white" id="team">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-3 text-xl text-gray-400">
+              <Loader2 className="animate-spin" size={24} />
+              Loading team...
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || !config?.team) {
+    return (
+      <section className="py-24 bg-gradient-to-b from-gray-50 to-white" id="team">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="text-red-400 text-lg">
+              Error loading team information
+            </div>
+            <p className="text-gray-500 mt-2">
+              Please check the configuration and try again.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const team = config.team;
+
   return (
     <section className="py-24 bg-gradient-to-b from-gray-50 to-white" id="team">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Meet Our Team
+            {team.title}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Passionate hackers, researchers and engineers working at the intersection of 
-            multi-agent systems, AI orchestration, and emergent behaviors
+            {team.description}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {team.map((member, index) => (
+          {team.members.map((member, index) => (
             <div
               key={member.name}
               className="group relative"
@@ -127,19 +90,25 @@ const TeamSection = () => {
                   </p>
                   
                   <div className="flex space-x-3">
-                    {Object.entries(member.social).map(([platform, link]) => {
-                      const Icon = socialIcons[platform];
-                      return (
-                        <a
-                          key={platform}
-                          href={link}
-                          className="text-gray-400 hover:text-indigo-600 transition-colors duration-200"
-                          aria-label={`${member.name}'s ${platform}`}
-                        >
-                          <Icon className="w-5 h-5" />
-                        </a>
-                      );
-                    })}
+                    {Object.entries(member.social)
+                      .filter(([, link]) => link && link !== '#') // Filter out empty or placeholder links
+                      .map(([platform, link]) => {
+                        const Icon = socialIcons[platform as keyof typeof socialIcons];
+                        if (!Icon) return null;
+                        
+                        return (
+                          <a
+                            key={platform}
+                            href={link}
+                            className="text-gray-400 hover:text-indigo-600 transition-colors duration-200"
+                            aria-label={`${member.name}'s ${platform}`}
+                            target={platform === 'email' ? undefined : '_blank'}
+                            rel={platform === 'email' ? undefined : 'noopener noreferrer'}
+                          >
+                            <Icon className="w-5 h-5" />
+                          </a>
+                        );
+                      })}
                   </div>
                 </div>
               </div>
@@ -147,16 +116,21 @@ const TeamSection = () => {
           ))}
         </div>
 
-        <div className="mt-16 text-center">
-          <div className="inline-flex items-center justify-center p-4 bg-indigo-50 rounded-xl">
-            <p className="text-gray-700">
-              Interested in joining the collective? 
-              <a href="#careers" className="ml-2 text-indigo-600 font-semibold hover:text-indigo-700 transition-colors">
-                We need you →
-              </a>
-            </p>
+        {team.callToAction && (
+          <div className="mt-16 text-center">
+            <div className="inline-flex items-center justify-center p-4 bg-indigo-50 rounded-xl">
+              <p className="text-gray-700">
+                {team.callToAction.text}
+                <a 
+                  href={team.callToAction.linkUrl} 
+                  className="ml-2 text-indigo-600 font-semibold hover:text-indigo-700 transition-colors"
+                >
+                  {team.callToAction.linkText}
+                </a>
+              </p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       <style jsx>{`
