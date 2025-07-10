@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'ea-platform/**'
-      - 'brand/**'
 
 permissions:
   contents: write
@@ -32,9 +29,9 @@ jobs:
           list-files: 'json'
           predicate-quantifier: 'every'
           filters: |
-            eru-brand: 
-              - 'eru-brand/**'
-              - '!eru-brand/**/*.md'
+            brand: 
+              - 'brand/**'
+              - '!/**/*.md'
 
 
   build-and-push:
