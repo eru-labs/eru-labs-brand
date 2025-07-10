@@ -1,117 +1,13 @@
+// File: src/components/sections/hero.tsx
 'use client';
 
 import { motion } from 'framer-motion';
 import { ArrowRight, Github, FileText, Users } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-
-interface ZenodoStats {
-  downloads: number;
-  views: number;
-}
-
-interface GitHubStats {
-  stars: number;
-  forks: number;
-  projectCount: number;
-}
+import { useERULabsData } from '../providers/data-provider';
 
 export default function Hero() {
-  const [stats, setStats] = useState<ZenodoStats>({ downloads: 0, views: 0 });
-  const [githubStats, setGithubStats] = useState<GitHubStats>({ stars: 0, forks: 0, projectCount: 0 });
-  const [loading, setLoading] = useState(true);
-
-  // Add Zenodo record IDs here
-  const zenodoRecordIds = [
-    '15724141',
-  ];
-
-  // Add GitHub repository URLs here
-  const githubRepos = [
-    'https://github.com/im-knots/ea-monorepo',
-    'https://github.com/im-knots/the-academy',
-    'https://github.com/im-knots/gvft',
-  ];
-
-  useEffect(() => {
-    const fetchZenodoStats = async () => {
-      try {
-        const promises = zenodoRecordIds.map(async (id) => {
-          const response = await fetch(`https://zenodo.org/api/records/${id}`);
-          if (!response.ok) throw new Error(`Failed to fetch record ${id}`);
-          const data = await response.json();
-          
-          return {
-            downloads: data.stats?.downloads || 0,
-            views: data.stats?.views || 0,
-          };
-        });
-
-        const results = await Promise.all(promises);
-        
-        // Aggregate stats
-        const totalStats = results.reduce(
-          (acc, curr) => ({
-            downloads: acc.downloads + curr.downloads,
-            views: acc.views + curr.views,
-          }),
-          { downloads: 0, views: 0 }
-        );
-
-        setStats(totalStats);
-      } catch (error) {
-        console.error('Error fetching Zenodo stats:', error);
-        // Fallback to default values on error
-      }
-    };
-
-    const fetchGitHubStats = async () => {
-      try {
-        const promises = githubRepos.map(async (url) => {
-          // Extract owner and repo from URL
-          const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
-          if (!match) throw new Error(`Invalid GitHub URL: ${url}`);
-          
-          const [, owner, repo] = match;
-          const response = await fetch(`https://api.github.com/repos/${owner}/${repo}`);
-          if (!response.ok) throw new Error(`Failed to fetch repo ${owner}/${repo}`);
-          const data = await response.json();
-          
-          return {
-            stars: data.stargazers_count || 0,
-            forks: data.forks_count || 0,
-          };
-        });
-
-        const results = await Promise.all(promises);
-        
-        // Aggregate GitHub stats
-        const totalGithubStats = results.reduce(
-          (acc, curr) => ({
-            stars: acc.stars + curr.stars,
-            forks: acc.forks + curr.forks,
-          }),
-          { stars: 0, forks: 0 }
-        );
-
-        setGithubStats({
-          ...totalGithubStats,
-          projectCount: githubRepos.length,
-        });
-      } catch (error) {
-        console.error('Error fetching GitHub stats:', error);
-        // Fallback to default values
-        setGithubStats({ stars: 0, forks: 0, projectCount: githubRepos.length });
-      }
-    };
-
-    const fetchAllStats = async () => {
-      await Promise.all([fetchZenodoStats(), fetchGitHubStats()]);
-      setLoading(false);
-    };
-
-    fetchAllStats();
-  }, []);
+  const { githubStats, zenodoStats, loading } = useERULabsData();
 
   return (
     <section className="relative min-h-screen flex items-center justify-center gradient-bg overflow-hidden">
@@ -194,7 +90,7 @@ export default function Hero() {
                 {loading ? (
                   <span className="inline-block w-16 h-8 bg-gray-700 animate-pulse rounded"></span>
                 ) : (
-                  stats.downloads.toLocaleString()
+                  zenodoStats.downloads.toLocaleString()
                 )}
               </div>
               <div className="text-sm text-gray-500">Paper Downloads</div>
@@ -204,7 +100,7 @@ export default function Hero() {
                 {loading ? (
                   <span className="inline-block w-16 h-8 bg-gray-700 animate-pulse rounded"></span>
                 ) : (
-                  stats.views.toLocaleString()
+                  zenodoStats.views.toLocaleString()
                 )}
               </div>
               <div className="text-sm text-gray-500">Paper Views</div>

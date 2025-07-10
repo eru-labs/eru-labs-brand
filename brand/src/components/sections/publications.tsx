@@ -1,40 +1,16 @@
+// File: src/components/sections/publications.tsx
 'use client';
 
 import { motion } from 'framer-motion';
 import { FileText, Download, ExternalLink, Calendar, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useERULabsData } from '../providers/data-provider';
 
 // Define your Zenodo record IDs here
 const ZENODO_IDS = [
   '15724141',
 ];
-
-interface ZenodoRecord {
-  id: string;
-  metadata: {
-    title: string;
-    creators: Array<{ name: string }>;
-    publication_date: string;
-    description: string;
-    keywords?: string[];
-    doi: string;
-  };
-  stats: {
-    downloads: number;
-  };
-  links: {
-    self_html: string;
-    files?: string;
-  };
-  files?: Array<{
-    key: string;
-    links: {
-      self: string;
-    };
-    type: string;
-  }>;
-}
 
 interface Publication {
   id: string;
@@ -52,59 +28,56 @@ interface Publication {
 
 export default function Publications() {
   const [publications, setPublications] = useState<Publication[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { zenodoRecords, loading, error } = useERULabsData();
 
   useEffect(() => {
-    const fetchPublications = async () => {
-      try {
-        setLoading(true);
-        const promises = ZENODO_IDS.map(async (id) => {
-          const response = await fetch(`https://zenodo.org/api/records/${id}`);
-          if (!response.ok) {
-            throw new Error(`Failed to fetch record ${id}: ${response.statusText}`);
-          }
-          return response.json() as Promise<ZenodoRecord>;
-        });
+    if (loading || zenodoRecords.length === 0) return;
 
-        const zenodoRecords = await Promise.all(promises);
-        
-        const transformedPublications: Publication[] = zenodoRecords.map((record, index) => {
-          // Find PDF file
-          const pdfFile = record.files?.find(file => 
-            file.type === 'pdf' || file.key.toLowerCase().includes('.pdf')
-          );
-          
-          return {
-            id: record.id,
-            title: record.metadata.title,
-            authors: record.metadata.creators.map(creator => creator.name),
-            date: new Date(record.metadata.publication_date).getFullYear().toString(),
-            abstract: record.metadata.description.replace(/<[^>]*>/g, '').substring(0, 300) + '...',
-            downloads: record.stats.downloads,
-            tags: record.metadata.keywords || [],
-            zenodoUrl: record.links.self_html,
-            pdfUrl: pdfFile ? pdfFile.links.self : record.links.self_html,
-            doi: record.metadata.doi,
-            featured: index === 0, // Mark first publication as featured
-          };
-        });
+    console.log('Publications - Processing Zenodo records:', {
+      loading,
+      zenodoRecordsCount: zenodoRecords.length,
+      zenodoRecords: zenodoRecords.map(r => ({ id: r.id, title: r.metadata?.title })),
+      ZENODO_IDS
+    });
 
-        setPublications(transformedPublications);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch publications');
-        console.error('Error fetching publications:', err);
-      } finally {
-        setLoading(false);
+    const transformedPublications: Publication[] = ZENODO_IDS.map((id, index) => {
+      console.log('Publications - Looking for record with ID:', id, 'Type:', typeof id);
+      const record = zenodoRecords.find(r => {
+        const match = r.id === id || r.id === parseInt(id).toString() || r.id.toString() === id;
+        console.log(`Publications - Comparing "${r.id}" === "${id}": ${match}`);
+        return match;
+      });
+      
+      if (!record) {
+        console.warn('Publications - Record not found for ID:', id);
+        return null;
       }
-    };
 
-    if (ZENODO_IDS.length > 0) {
-      fetchPublications();
-    } else {
-      setLoading(false);
-    }
-  }, []);
+      console.log('Publications - Found record:', record.metadata.title);
+
+      // Find PDF file
+      const pdfFile = record.files?.find(file => 
+        file.type === 'pdf' || file.key.toLowerCase().includes('.pdf')
+      );
+      
+      return {
+        id: record.id,
+        title: record.metadata.title,
+        authors: record.metadata.creators.map(creator => creator.name),
+        date: new Date(record.metadata.publication_date).getFullYear().toString(),
+        abstract: record.metadata.description.replace(/<[^>]*>/g, '').substring(0, 300) + '...',
+        downloads: record.stats.downloads,
+        tags: record.metadata.keywords || [],
+        zenodoUrl: record.links.self_html,
+        pdfUrl: pdfFile ? pdfFile.links.self : record.links.self_html,
+        doi: record.metadata.doi,
+        featured: index === 0, // Mark first publication as featured
+      };
+    }).filter(Boolean) as Publication[];
+
+    console.log('Publications - Final publications:', transformedPublications.length, transformedPublications);
+    setPublications(transformedPublications);
+  }, [zenodoRecords, loading]);
 
   if (loading) {
     return (

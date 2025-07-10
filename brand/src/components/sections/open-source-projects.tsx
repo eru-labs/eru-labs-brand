@@ -1,8 +1,9 @@
-// File: components/sections/open-source-projects.tsx
+// File: src/components/sections/open-source-projects.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { Github, Star, GitFork, ExternalLink, Code, Users, Zap, Brain, AlertCircle, Calendar, RefreshCw, Download, FileText, GraduationCap, Cpu, BotMessageSquare } from 'lucide-react';
+import { useERULabsData } from '../providers/data-provider';
 
 interface GitHubRepo {
   id: number;
@@ -52,7 +53,6 @@ interface ZenodoRecord {
 }
 
 interface ProjectConfig {
-  // Can be either GitHub URL or Zenodo URL
   sourceUrl: string;
   sourceType: 'github' | 'zenodo';
   category: 'research' | 'framework' | 'tools' | 'infrastructure';
@@ -62,7 +62,7 @@ interface ProjectConfig {
   demoUrl?: string;
   paperUrl?: string;
   docsUrl?: string;
-  githubUrl?: string; // For Zenodo records that also have GitHub repos
+  githubUrl?: string;
 }
 
 interface ProcessedProject {
@@ -76,27 +76,22 @@ interface ProcessedProject {
   languageColor?: string;
   customDescription?: string;
   updated_at: string;
-  
-  // GitHub-specific fields
   stargazers_count?: number;
   forks_count?: number;
   language?: string;
   topics?: string[];
-  
-  // Zenodo-specific fields
   downloads?: number;
   views?: number;
   authors?: string[];
   doi?: string;
   resourceType?: string;
-  
   links: {
-    source: string; // Main source URL (GitHub or Zenodo)
+    source: string;
     github?: string;
     demo?: string;
     paper?: string;
     docs?: string;
-    download?: string; // For Zenodo PDF downloads
+    download?: string;
   };
 }
 
@@ -127,247 +122,70 @@ const categoryIcons = {
   infrastructure: Code,
 };
 
-const useMultiSourceProjects = (projectConfigs: ProjectConfig[]) => {
-  const [projects, setProjects] = useState<ProcessedProject[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [lastFetch, setLastFetch] = useState<number | null>(null);
-
-  const CACHE_KEY = 'eru-labs-projects-v2'; // Updated version to clear old cache
-  const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
-  const fetchGitHubRepos = async (urls: string[]): Promise<GitHubRepo[]> => {
-    const repoUrls = urls.join(',');
-    console.log('Fetching GitHub data via API route...');
-    
-    // Use your existing API route to avoid CORS issues
-    const response = await fetch(`/api/github-projects?repos=${encodeURIComponent(repoUrls)}`);
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.details || `API error: ${response.statusText}`);
-    }
-
-    return response.json();
+const processGitHubProject = (repo: GitHubRepo, config: ProjectConfig): ProcessedProject => {
+  return {
+    id: repo.id.toString(),
+    name: repo.name,
+    description: config.customDescription || repo.description || 'No description available',
+    sourceType: 'github',
+    category: config.category,
+    featured: config.featured || false,
+    icon: config.icon || categoryIcons[config.category],
+    languageColor: languageColors[repo.language] || '#6B7280',
+    customDescription: config.customDescription,
+    updated_at: repo.updated_at,
+    stargazers_count: repo.stargazers_count,
+    forks_count: repo.forks_count,
+    language: repo.language,
+    topics: repo.topics,
+    links: {
+      source: repo.html_url,
+      github: repo.html_url,
+      ...(config.demoUrl && { demo: config.demoUrl }),
+      ...(config.paperUrl && { paper: config.paperUrl }),
+      ...(config.docsUrl && { docs: config.docsUrl }),
+      ...(repo.homepage && { demo: repo.homepage }),
+    },
   };
+};
 
-  const fetchZenodoRecord = async (url: string): Promise<ZenodoRecord> => {
-    const match = url.match(/zenodo\.org\/records?\/(\d+)/);
-    if (!match) throw new Error(`Invalid Zenodo URL: ${url}`);
-    
-    const recordId = match[1];
-    const response = await fetch(`https://zenodo.org/api/records/${recordId}`);
-    if (!response.ok) throw new Error(`Zenodo API error: ${response.statusText}`);
-    
-    return response.json();
+const processZenodoProject = (record: ZenodoRecord, config: ProjectConfig): ProcessedProject => {
+  const pdfFile = record.files?.find(file => 
+    file.type === 'pdf' || file.key.toLowerCase().includes('.pdf')
+  );
+  
+  return {
+    id: record.id,
+    name: record.metadata.title,
+    description: config.customDescription || '',
+    sourceType: 'zenodo',
+    category: config.category,
+    featured: config.featured || false,
+    icon: config.icon || categoryIcons[config.category],
+    customDescription: config.customDescription,
+    updated_at: record.metadata.publication_date,
+    downloads: record.stats.downloads,
+    views: record.stats.views,
+    authors: record.metadata.creators.map(creator => creator.name),
+    doi: record.metadata.doi,
+    resourceType: record.metadata.resource_type.title,
+    links: {
+      source: record.links.self_html,
+      paper: record.links.self_html,
+      ...(config.githubUrl && { github: config.githubUrl }),
+      ...(config.demoUrl && { demo: config.demoUrl }),
+      ...(config.docsUrl && { docs: config.docsUrl }),
+      ...(pdfFile && { download: pdfFile.links.self }),
+    },
   };
-
-  const processGitHubProject = (repo: GitHubRepo, config: ProjectConfig): ProcessedProject => {
-    const pdfFile = undefined; // GitHub repos don't have direct PDF files in this context
-    
-    return {
-      id: repo.id.toString(),
-      name: repo.name,
-      description: config.customDescription || repo.description || 'No description available',
-      sourceType: 'github',
-      category: config.category,
-      featured: config.featured || false,
-      icon: config.icon || categoryIcons[config.category], // Don't cache this
-      languageColor: languageColors[repo.language] || '#6B7280',
-      customDescription: config.customDescription,
-      updated_at: repo.updated_at,
-      stargazers_count: repo.stargazers_count,
-      forks_count: repo.forks_count,
-      language: repo.language,
-      topics: repo.topics,
-      links: {
-        source: repo.html_url,
-        github: repo.html_url,
-        ...(config.demoUrl && { demo: config.demoUrl }),
-        ...(config.paperUrl && { paper: config.paperUrl }),
-        ...(config.docsUrl && { docs: config.docsUrl }),
-        ...(repo.homepage && { demo: repo.homepage }),
-      },
-    };
-  };
-
-  const processZenodoProject = (record: ZenodoRecord, config: ProjectConfig): ProcessedProject => {
-    // Find PDF file for download
-    const pdfFile = record.files?.find(file => 
-      file.type === 'pdf' || file.key.toLowerCase().includes('.pdf')
-    );
-    
-    return {
-      id: record.id,
-      name: record.metadata.title,
-      description: config.customDescription || '', // Only show custom description for Zenodo
-      sourceType: 'zenodo',
-      category: config.category,
-      featured: config.featured || false,
-      icon: config.icon || categoryIcons[config.category],
-      customDescription: config.customDescription,
-      updated_at: record.metadata.publication_date,
-      downloads: record.stats.downloads,
-      views: record.stats.views,
-      authors: record.metadata.creators.map(creator => creator.name),
-      doi: record.metadata.doi,
-      resourceType: record.metadata.resource_type.title,
-      links: {
-        source: record.links.self_html,
-        paper: record.links.self_html,
-        ...(config.githubUrl && { github: config.githubUrl }),
-        ...(config.demoUrl && { demo: config.demoUrl }),
-        ...(config.docsUrl && { docs: config.docsUrl }),
-        ...(pdfFile && { download: pdfFile.links.self }),
-      },
-    };
-  };
-
-  const fetchProjects = async (forceRefresh = false) => {
-    if (projectConfigs.length === 0) {
-      setLoading(false);
-      return;
-    }
-
-    // Check cache first (unless force refresh)
-    if (!forceRefresh && typeof window !== 'undefined') {
-      try {
-        const cached = localStorage.getItem(CACHE_KEY);
-        if (cached) {
-          const { data, timestamp } = JSON.parse(cached);
-          if (Date.now() - timestamp < CACHE_DURATION) {
-            console.log('Using cached project data');
-            
-            // Restore icons from configs since they can't be cached
-            const restoredProjects = data.map((cachedProject: any) => {
-              const config = projectConfigs.find(c => {
-                if (c.sourceType === 'github') {
-                  // For GitHub, match by repository name or URL
-                  return c.sourceUrl.includes(cachedProject.name) || 
-                         cachedProject.id === c.sourceUrl.split('/').pop();
-                } else if (c.sourceType === 'zenodo') {
-                  // For Zenodo, match by record ID
-                  return c.sourceUrl.includes(cachedProject.id);
-                }
-                return false;
-              });
-              
-              return {
-                ...cachedProject,
-                icon: config?.icon || categoryIcons[cachedProject.category],
-                // Also restore description to ensure zenodo projects have empty descriptions
-                description: config?.sourceType === 'zenodo' ? '' : cachedProject.description
-              };
-            });
-            
-            setProjects(restoredProjects);
-            setLastFetch(timestamp);
-            setLoading(false);
-            return;
-          }
-        }
-      } catch (err) {
-        console.warn('Failed to load cache:', err);
-      }
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      console.log('Fetching fresh project data...');
-      
-      // Separate GitHub and Zenodo configs
-      const githubConfigs = projectConfigs.filter(config => config.sourceType === 'github');
-      const zenodoConfigs = projectConfigs.filter(config => config.sourceType === 'zenodo');
-      
-      const processedProjects: ProcessedProject[] = [];
-      
-      // Fetch GitHub projects in batch through API route
-      if (githubConfigs.length > 0) {
-        try {
-          const githubUrls = githubConfigs.map(config => config.sourceUrl);
-          const githubRepos = await fetchGitHubRepos(githubUrls);
-          
-          // Process GitHub projects
-          githubRepos.forEach((repo) => {
-            // Find matching config by comparing GitHub URLs
-            const config = githubConfigs.find(c => 
-              c.sourceUrl.includes(repo.full_name) || 
-              repo.html_url.includes(c.sourceUrl.split('/').slice(-2).join('/'))
-            );
-            
-            if (config) {
-              processedProjects.push(processGitHubProject(repo, config));
-            } else {
-              console.warn(`No config found for repo: ${repo.full_name}`);
-            }
-          });
-        } catch (err) {
-          console.error('Failed to fetch GitHub projects:', err);
-          // Continue with Zenodo projects even if GitHub fails
-        }
-      }
-      
-      // Fetch Zenodo projects individually
-      if (zenodoConfigs.length > 0) {
-        const zenodoPromises = zenodoConfigs.map(async (config) => {
-          try {
-            const record = await fetchZenodoRecord(config.sourceUrl);
-            return processZenodoProject(record, config);
-          } catch (err) {
-            console.error(`Failed to fetch Zenodo project ${config.sourceUrl}:`, err);
-            return null;
-          }
-        });
-        
-        const zenodoResults = await Promise.all(zenodoPromises);
-        zenodoResults.forEach(project => {
-          if (project) processedProjects.push(project);
-        });
-      }
-
-      setProjects(processedProjects);
-      
-      const now = Date.now();
-      setLastFetch(now);
-
-      // Cache the results (excluding icons since they can't be serialized)
-      if (typeof window !== 'undefined') {
-        try {
-          const cacheableProjects = processedProjects.map(project => {
-            const { icon, ...cacheableProject } = project;
-            return cacheableProject;
-          });
-          
-          localStorage.setItem(CACHE_KEY, JSON.stringify({
-            data: cacheableProjects,
-            timestamp: now,
-          }));
-        } catch (err) {
-          console.warn('Failed to cache data:', err);
-        }
-      }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch projects';
-      setError(errorMessage);
-      console.error('Error fetching projects:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProjects();
-  }, []); // Only run once on mount
-
-  return { projects, loading, error, lastFetch, refetch: () => fetchProjects(true) };
 };
 
 const OpenSourceProjects = () => {
   const [activeCategory, setActiveCategory] = useState('all');
+  const [projects, setProjects] = useState<ProcessedProject[]>([]);
 
-  // Configure your projects here - supports both GitHub and Zenodo URLs
+  const { githubRepos, zenodoRecords, loading, error, lastFetch, refetch, getGitHubRepoByUrl, getZenodoRecordById } = useERULabsData();
+
   const projectConfigs: ProjectConfig[] = [
     {
       sourceUrl: 'https://github.com/im-knots/the-academy',
@@ -398,11 +216,61 @@ const OpenSourceProjects = () => {
       category: 'research',
       icon: BotMessageSquare,
       customDescription: 'This is Your AI on Peer Pressure: An Observational Study of Inter-Agent Social Dynamics',
-      githubUrl: 'https://github.com/im-knots/the-academy', // Link to related GitHub repo
+      githubUrl: 'https://github.com/im-knots/the-academy',
     },
   ];
 
-  const { projects, loading, error, lastFetch, refetch } = useMultiSourceProjects(projectConfigs);
+  useEffect(() => {
+    if (loading) return;
+
+    console.log('DataProvider state:', { 
+      loading,
+      error,
+      githubRepos: githubRepos.length, 
+      zenodoRecords: zenodoRecords.length,
+      zenodoRecordsData: zenodoRecords
+    });
+
+    const processedProjects: ProcessedProject[] = [];
+
+    // Process GitHub projects
+    const githubConfigs = projectConfigs.filter(config => config.sourceType === 'github');
+    console.log('GitHub configs:', githubConfigs.length);
+    githubConfigs.forEach(config => {
+      const repo = getGitHubRepoByUrl(config.sourceUrl);
+      if (repo) {
+        console.log('Found GitHub repo:', repo.name);
+        processedProjects.push(processGitHubProject(repo, config));
+      } else {
+        console.warn('GitHub repo not found for:', config.sourceUrl);
+      }
+    });
+
+    // Process Zenodo projects
+    const zenodoConfigs = projectConfigs.filter(config => config.sourceType === 'zenodo');
+    console.log('Zenodo configs:', zenodoConfigs.length, zenodoConfigs);
+    
+    zenodoConfigs.forEach(config => {
+      const match = config.sourceUrl.match(/zenodo\.org\/records?\/(\d+)/);
+      if (match) {
+        const recordId = match[1];
+        console.log('Looking for Zenodo record ID:', recordId);
+        console.log('Available Zenodo records:', zenodoRecords.map(r => r.id));
+        const record = getZenodoRecordById(recordId);
+        if (record) {
+          console.log('Found Zenodo record:', record.metadata.title);
+          processedProjects.push(processZenodoProject(record, config));
+        } else {
+          console.warn('Zenodo record not found for ID:', recordId);
+        }
+      } else {
+        console.warn('Invalid Zenodo URL:', config.sourceUrl);
+      }
+    });
+
+    console.log('Final processed projects:', processedProjects.length, processedProjects);
+    setProjects(processedProjects);
+  }, [githubRepos, zenodoRecords, loading, getGitHubRepoByUrl, getZenodoRecordById, error]);
 
   const categories = [
     { id: 'all', name: 'All Projects', count: projects.length },
@@ -586,7 +454,7 @@ const OpenSourceProjects = () => {
                 </div>
 
                 {/* Description */}
-                {project.description && (
+                {project.description && project.sourceType === 'github' && (
                   <p className="text-gray-300 mb-6 leading-relaxed">
                     {project.description}
                   </p>
@@ -637,7 +505,7 @@ const OpenSourceProjects = () => {
                 {/* Action Links */}
                 <div className="flex items-center space-x-3 flex-wrap gap-2">
                   {Object.entries(project.links)
-                    .filter(([type]) => type !== 'source') // Don't show redundant source button
+                    .filter(([type]) => type !== 'source')
                     .map(([type, link]) => {
                     const linkConfig = {
                       github: { icon: Github, label: 'GitHub' },

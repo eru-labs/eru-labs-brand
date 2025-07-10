@@ -113,9 +113,39 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const fetchZenodoRecord = async (id: string): Promise<ZenodoRecord> => {
-    const response = await fetch(`https://zenodo.org/api/records/${id}`);
-    if (!response.ok) throw new Error(`Zenodo API error: ${response.statusText}`);
-    return response.json();
+    const apiUrl = `https://zenodo.org/api/records/${id}`;
+    console.log('Fetching Zenodo record from:', apiUrl);
+    
+    try {
+      const response = await fetch(apiUrl, {
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+      
+      console.log('Zenodo API response status:', response.status, response.statusText);
+      
+      if (!response.ok) {
+        // Try alternative API endpoint
+        const altApiUrl = `https://zenodo.org/api/records/${id}?access_token=`;
+        console.log('Trying alternative endpoint:', altApiUrl);
+        
+        const altResponse = await fetch(altApiUrl);
+        if (!altResponse.ok) {
+          throw new Error(`Zenodo API error: ${response.status} ${response.statusText} for record ${id}`);
+        }
+        const altData = await altResponse.json();
+        console.log('Successfully fetched Zenodo record from alt endpoint:', altData.metadata?.title);
+        return altData;
+      }
+      
+      const data = await response.json();
+      console.log('Successfully fetched Zenodo record:', data.metadata?.title);
+      return data;
+    } catch (error) {
+      console.error('Failed to fetch Zenodo record:', id, error);
+      throw error;
+    }
   };
 
   const loadFromCache = (): boolean => {
@@ -164,32 +194,50 @@ export function DataProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    console.log('DataProvider: Starting fetch with configs:', { GITHUB_REPOS, ZENODO_RECORD_IDS });
     setLoading(true);
     setError(null);
 
     try {
       // Fetch GitHub repos
+      console.log('DataProvider: Fetching GitHub repos...');
       const githubPromise = fetchGitHubRepos(GITHUB_REPOS);
       
-      // Fetch Zenodo records
-      const zenodoPromises = ZENODO_RECORD_IDS.map(id => fetchZenodoRecord(id));
+      // Fetch Zenodo records with better error handling
+      console.log('DataProvider: Fetching Zenodo records...');
+      const zenodoResults = [];
+      
+      for (const id of ZENODO_RECORD_IDS) {
+        try {
+          console.log('DataProvider: Fetching Zenodo record:', id);
+          const record = await fetchZenodoRecord(id);
+          zenodoResults.push(record);
+        } catch (error) {
+          console.error('DataProvider: Failed to fetch Zenodo record:', id, error);
+          // Continue with other records even if one fails
+        }
+      }
 
-      const [githubData, ...zenodoData] = await Promise.all([
-        githubPromise,
-        ...zenodoPromises
-      ]);
+      console.log('DataProvider: Waiting for GitHub data...');
+      const githubData = await githubPromise;
+      
+      console.log('DataProvider: Received data:', {
+        githubRepos: githubData.length,
+        zenodoRecords: zenodoResults.length,
+        zenodoData: zenodoResults
+      });
 
       setGithubRepos(githubData);
-      setZenodoRecords(zenodoData);
+      setZenodoRecords(zenodoResults);
       
       const now = Date.now();
       setLastFetch(now);
       
-      saveToCache(githubData, zenodoData);
+      saveToCache(githubData, zenodoResults);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch data';
+      console.error('DataProvider: Error fetching data:', err);
       setError(errorMessage);
-      console.error('Error fetching data:', err);
     } finally {
       setLoading(false);
     }
@@ -220,7 +268,27 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const getZenodoRecordById = (id: string): ZenodoRecord | undefined => {
-    return zenodoRecords.find(record => record.id === id);
+    console.log('Looking for Zenodo record with ID:', id, 'Type:', typeof id);
+    console.log('Available records count:', zenodoRecords.length);
+    zenodoRecords.forEach((record, index) => {
+      console.log(`Record ${index}:`, {
+        id: record.id,
+        type: typeof record.id,
+        length: record.id.length,
+        title: record.metadata?.title,
+        strictEqual: record.id === id,
+        looseEqual: record.id == id
+      });
+    });
+    
+    const found = zenodoRecords.find(record => {
+      const match = record.id === id || record.id === parseInt(id).toString() || record.id.toString() === id;
+      console.log(`Comparing "${record.id}" === "${id}": ${match}`);
+      return match;
+    });
+    
+    console.log('Found record:', found ? found.metadata.title : 'NOT FOUND');
+    return found;
   };
 
   const value: DataContextType = {
