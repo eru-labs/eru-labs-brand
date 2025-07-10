@@ -35,10 +35,10 @@ const Header = () => {
       name: 'Mission',
       href: '#mission'
     },
-    {
-      name: 'Blog',
-      href: '#blog'
-    }
+    // {
+    //   name: 'Blog',
+    //   href: '#blog'
+    // }
   ];
 
   return (

@@ -94,7 +94,7 @@
       {
         "name": "umbra",
         "role": "Contributor",
-        "bio": "have Umbra fill this out",
+        "bio": "Bridging the gap between chaos and compliance; one pipeline at a time.",
         "image": "img/umbra.jpeg",
         "social": {
           "github": "https://github.com/umbra-tech",
@@ -181,5 +181,65 @@
       "linkText": "We need you →",
       "linkUrl": "#careers"
     }
+  },
+  "mission": {
+    "title": "Our Mission",
+    "subtitle": "Building a future where technology serves humanity, not the other way around",
+    "description": "Born from the hacker ethos and IRC culture that built the early internet, we believe in radical transparency, collaborative innovation, and the fundamental right to free and open information. While others abandoned their principles for profit, we hold fast to a simple truth: technology should empower everyone, not just the few.",
+    "vision": {
+      "title": "Vision", 
+      "content": "A world where AI systems are transparent, the internet remains free and open, and technology amplifies human potential rather than replacing it. We envision collaborative AI that respects privacy, promotes creativity, and serves the global commons."
+    },
+    "values": [
+      {
+        "title": "Radical Openness",
+        "description": "Every line of code, every research paper, every breakthrough. Open source isn't just our method, it's our philosophy. Information wants to be free.",
+        "icon": "LockOpen"
+      },
+      {
+        "title": "Hacker Ethics",
+        "description": "Access to computers and anything that might teach you something about how the world works should be unlimited and total. Always yield to the hands-on imperative.",
+        "icon": "Code"
+      },
+      {
+        "title": "Internet Freedom",
+        "description": "The internet was built by hackers, for everyone. We fight against surveillance capitalism, data hoarding, and the corporate capture of digital spaces.",
+        "icon": "Zap"
+      },
+      {
+        "title": "Human-Centric AI",
+        "description": "We build AI that augments human intelligence rather than replacing it. Technology should expand what humans can do, not make them obsolete.",
+        "icon": "Users"
+      },
+      {
+        "title": "Collaborative Spirit",
+        "description": "Like the IRC channels where ideas flowed freely, we believe the best innovations emerge from open collaboration across boundaries.",
+        "icon": "Brain"
+      },
+      {
+        "title": "Production Reality",
+        "description": "Our research isn't just academic, it's battle-tested in real systems. We bridge the gap between theory and practice.",
+        "icon": "GraduationCap"
+      },
+      {
+        "title": "Digital Sovereignty",
+        "description": "Users should control their own data, algorithms, and digital experiences. We reject the surveillance economy and build tools for self-determination.",
+        "icon": "Cpu"
+      },
+      {
+        "title": "Tinkerer's Mindset",
+        "description": "Take it apart, figure out how it works, make it better. The hacker spirit of curiosity and creative destruction drives everything we do.",
+        "icon": "BotMessageSquare"
+      }
+    ],
+    "goals": [
+      "Advance understanding of multi-agent AI interactions and emergent behaviors",
+      "Develop ethical frameworks that prioritize human agency and digital rights",
+      "Create open-source tools that democratize AI research and development", 
+      "Preserve the free and open internet against corporate enclosure",
+      "Foster a new generation of hackers, researchers, and digital rights advocates",
+      "Bridge academic research with real-world production challenges",
+      "Build AI systems that respect privacy, creativity, and human autonomy"
+    ]
   }
 }

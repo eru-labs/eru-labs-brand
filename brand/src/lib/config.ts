@@ -55,6 +55,21 @@ export interface SiteConfig {
       linkUrl: string;
     };
   };
+  mission: {
+    title: string;
+    subtitle: string;
+    description: string;
+    vision: {
+      title: string;
+      content: string;
+    };
+    values: Array<{
+      title: string;
+      description: string;
+      icon: string;
+    }>;
+    goals: string[];
+  };
 }
 
 let cachedConfig: SiteConfig | null = null;
@@ -162,6 +177,26 @@ export function getDefaultConfig(): SiteConfig {
         linkText: "We need you →",
         linkUrl: "#careers"
       }
+    },
+    mission: {
+      title: "Our Mission",
+      subtitle: "Democratizing AI through open research and ethical innovation",
+      description: "We believe that artificial intelligence should be transparent, accessible, and beneficial to all of humanity.",
+      vision: {
+        title: "Vision",
+        content: "A future where AI systems are transparent, explainable, and work collaboratively with humans."
+      },
+      values: [
+        {
+          title: "Open Science",
+          description: "All our research is open source and freely accessible.",
+          icon: "FileText"
+        }
+      ],
+      goals: [
+        "Advance understanding of multi-agent AI interactions",
+        "Develop ethical frameworks for AI system design"
+      ]
     }
   };
 }
