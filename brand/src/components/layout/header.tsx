@@ -1,14 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Github, ChevronDown } from 'lucide-react';
+import { Menu, X, Github } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,22 +21,11 @@ const Header = () => {
   const navigation = [
     {
       name: 'Research',
-      href: '#research',
-      dropdown: [
-        { name: 'Multi-Agent Systems', href: '#multi-agent' },
-        { name: 'AI Orchestration', href: '#orchestration' },
-        { name: 'Emergent Behaviors', href: '#emergent' },
-        { name: 'Publications', href: '#publications' }
-      ]
+      href: '#publications'
     },
     {
       name: 'Open Source',
-      href: '#open-source',
-      dropdown: [
-        { name: 'Projects', href: '#projects' },
-        { name: 'Contributions', href: '#contributions' },
-        { name: 'Documentation', href: '#docs' }
-      ]
+      href: '#open-source'
     },
     {
       name: 'Team',
@@ -49,12 +37,7 @@ const Header = () => {
     },
     {
       name: 'About',
-      href: '#about',
-      dropdown: [
-        { name: 'Mission', href: '#mission' },
-        { name: 'Careers', href: '#careers' },
-        { name: 'Contact', href: '#contact' }
-      ]
+      href: '#about'
     }
   ];
 
@@ -98,45 +81,17 @@ const Header = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
             {navigation.map((item) => (
-              <div 
+              <a
                 key={item.name}
-                className="relative"
-                onMouseEnter={() => setActiveDropdown(item.name)}
-                onMouseLeave={() => setActiveDropdown(null)}
+                href={item.href}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                  isScrolled 
+                    ? 'text-gray-700 hover:text-indigo-600 hover:bg-gray-100' 
+                    : 'text-white/90 hover:text-white hover:bg-white/10'
+                }`}
               >
-                <a
-                  href={item.href}
-                  className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                    isScrolled 
-                      ? 'text-gray-700 hover:text-indigo-600 hover:bg-gray-100' 
-                      : 'text-white/90 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  {item.name}
-                  {item.dropdown && (
-                    <ChevronDown className={`ml-1 w-4 h-4 transition-transform duration-200 ${
-                      activeDropdown === item.name ? 'rotate-180' : ''
-                    }`} />
-                  )}
-                </a>
-                
-                {/* Dropdown Menu */}
-                {item.dropdown && activeDropdown === item.name && (
-                  <div className="absolute top-full left-0 mt-2 w-56 rounded-xl bg-white shadow-xl ring-1 ring-black/5 overflow-hidden transform origin-top animate-dropdown">
-                    <div className="py-2">
-                      {item.dropdown.map((subItem) => (
-                        <a
-                          key={subItem.name}
-                          href={subItem.href}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
-                        >
-                          {subItem.name}
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+                {item.name}
+              </a>
             ))}
             
             {/* GitHub Link */}
@@ -175,29 +130,14 @@ const Header = () => {
           <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-xl rounded-b-2xl overflow-hidden animate-slideDown">
             <div className="px-4 py-6 space-y-1">
               {navigation.map((item) => (
-                <div key={item.name}>
-                  <a
-                    href={item.href}
-                    className="block px-4 py-3 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 rounded-lg transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {item.name}
-                  </a>
-                  {item.dropdown && (
-                    <div className="ml-4 mt-1 space-y-1">
-                      {item.dropdown.map((subItem) => (
-                        <a
-                          key={subItem.name}
-                          href={subItem.href}
-                          className="block px-4 py-2 text-sm text-gray-600 hover:text-indigo-600 hover:bg-gray-50 rounded-lg transition-colors"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                          {subItem.name}
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <a
+                  key={item.name}
+                  href={item.href}
+                  className="block px-4 py-3 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 rounded-lg transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {item.name}
+                </a>
               ))}
               
               <a
@@ -214,17 +154,6 @@ const Header = () => {
       </nav>
 
       <style jsx>{`
-        @keyframes dropdown {
-          from {
-            opacity: 0;
-            transform: scale(0.95) translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-          }
-        }
-
         @keyframes slideDown {
           from {
             opacity: 0;
@@ -234,10 +163,6 @@ const Header = () => {
             opacity: 1;
             transform: translateY(0);
           }
-        }
-
-        .animate-dropdown {
-          animation: dropdown 0.2s ease-out;
         }
 
         .animate-slideDown {
