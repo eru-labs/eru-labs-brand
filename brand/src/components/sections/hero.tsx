@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useERULabsData } from '../providers/data-provider';
 
 export default function Hero() {
-  const { githubStats, zenodoStats, loading } = useERULabsData();
+  const { config, githubStats, zenodoStats, loading } = useERULabsData();
 
   return (
     <section className="relative min-h-screen flex items-center justify-center gradient-bg overflow-hidden">
@@ -163,33 +163,35 @@ export default function Hero() {
           </motion.div>
 
           {/* Featured Research */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="mt-16 p-6 rounded-xl bg-gray-900/50 border border-gray-800"
-          >
-            <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-              <span className="text-green-500">Latest Publication</span>
-              <span>•</span>
-              <span>3 weeks ago</span>
-            </div>
-            <h3 className="text-lg font-semibold mb-2">
-              This is Your AI on Peer Pressure: An Observational Study of Inter-Agent Social Dynamics
-            </h3>
-            <p className="text-gray-400 text-sm">
-                When AI agents converse, do they influence each other like humans do?
-            </p>
-            <Link 
-              href="https://zenodo.org/records/15724141"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 mt-3 text-sm text-green-500 hover:text-green-400 transition-colors"
+          {config?.hero.featuredPublication && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="mt-16 p-6 rounded-xl bg-gray-900/50 border border-gray-800"
             >
-              Read on Zenodo
-              <ArrowRight size={14} />
-            </Link>
-          </motion.div>
+              <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
+                <span className="text-green-500">Latest Publication</span>
+                <span>•</span>
+                <span>3 weeks ago</span>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">
+                {config.hero.featuredPublication.title}
+              </h3>
+              <p className="text-gray-400 text-sm">
+                  When AI agents converse, do they influence each other like humans do?
+              </p>
+              <Link 
+                href={config.hero.featuredPublication.zenodoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 mt-3 text-sm text-green-500 hover:text-green-400 transition-colors"
+              >
+                Read on Zenodo
+                <ArrowRight size={14} />
+              </Link>
+            </motion.div>
+          )}
         </motion.div>
       </div>
     </section>

@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { Github, Star, GitFork, ExternalLink, Code, Users, Zap, Brain, AlertCircle, Calendar, RefreshCw, Download, FileText, GraduationCap, Cpu, BotMessageSquare } from 'lucide-react';
 import { useERULabsData } from '../providers/data-provider';
+import { getIconComponent } from '@/lib/config';
 
 interface GitHubRepo {
   id: number;
@@ -58,7 +59,7 @@ interface ProjectConfig {
   category: 'research' | 'framework' | 'tools' | 'infrastructure';
   featured?: boolean;
   customDescription?: string;
-  icon?: React.ComponentType<any>;
+  icon?: string;
   demoUrl?: string;
   paperUrl?: string;
   docsUrl?: string;
@@ -130,7 +131,7 @@ const processGitHubProject = (repo: GitHubRepo, config: ProjectConfig): Processe
     sourceType: 'github',
     category: config.category,
     featured: config.featured || false,
-    icon: config.icon || categoryIcons[config.category],
+    icon: getIconComponent(config.icon) || categoryIcons[config.category],
     languageColor: languageColors[repo.language] || '#6B7280',
     customDescription: config.customDescription,
     updated_at: repo.updated_at,
@@ -161,7 +162,7 @@ const processZenodoProject = (record: ZenodoRecord, config: ProjectConfig): Proc
     sourceType: 'zenodo',
     category: config.category,
     featured: config.featured || false,
-    icon: config.icon || categoryIcons[config.category],
+    icon: getIconComponent(config.icon) || categoryIcons[config.category],
     customDescription: config.customDescription,
     updated_at: record.metadata.publication_date,
     downloads: record.stats.downloads,
@@ -184,93 +185,54 @@ const OpenSourceProjects = () => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [projects, setProjects] = useState<ProcessedProject[]>([]);
 
-  const { githubRepos, zenodoRecords, loading, error, lastFetch, refetch, getGitHubRepoByUrl, getZenodoRecordById } = useERULabsData();
-
-  const projectConfigs: ProjectConfig[] = [
-    {
-      sourceUrl: 'https://github.com/im-knots/the-academy',
-      sourceType: 'github',
-      category: 'infrastructure',
-      featured: true,
-      icon: GraduationCap,
-      customDescription: 'Research platform for studying multi-agent AI interactions and peer pressure dynamics',
-    },
-    {
-      sourceUrl: 'https://github.com/im-knots/ea-monorepo',
-      sourceType: 'github',
-      category: 'infrastructure',
-      icon: Cpu,
-      customDescription: 'Modular AI orchestration platform for building complex agent-based workflows',
-      docsUrl: '#docs',
-    },
-    {
-      sourceUrl: 'https://github.com/im-knots/gvft',
-      sourceType: 'github',
-      category: 'framework',
-      icon: Brain,
-      customDescription: 'Gestalt Vector Field Theory - Novel framework for evolving neural architectures using field theoretic concepts',
-    },
-    {
-      sourceUrl: 'https://zenodo.org/records/15724141',
-      sourceType: 'zenodo',
-      category: 'research',
-      icon: BotMessageSquare,
-      customDescription: 'This is Your AI on Peer Pressure: An Observational Study of Inter-Agent Social Dynamics',
-      githubUrl: 'https://github.com/im-knots/the-academy',
-    },
-  ];
+  const { config, githubRepos, zenodoRecords, loading, error, lastFetch, refetch, getGitHubRepoByUrl, getZenodoRecordById } = useERULabsData();
 
   useEffect(() => {
-    if (loading) return;
+    if (loading || !config) return;
 
     console.log('DataProvider state:', { 
       loading,
       error,
       githubRepos: githubRepos.length, 
       zenodoRecords: zenodoRecords.length,
+      projectConfigs: config.openSourceProjects.length,
       zenodoRecordsData: zenodoRecords
     });
 
     const processedProjects: ProcessedProject[] = [];
 
-    // Process GitHub projects
-    const githubConfigs = projectConfigs.filter(config => config.sourceType === 'github');
-    console.log('GitHub configs:', githubConfigs.length);
-    githubConfigs.forEach(config => {
-      const repo = getGitHubRepoByUrl(config.sourceUrl);
-      if (repo) {
-        console.log('Found GitHub repo:', repo.name);
-        processedProjects.push(processGitHubProject(repo, config));
-      } else {
-        console.warn('GitHub repo not found for:', config.sourceUrl);
-      }
-    });
-
-    // Process Zenodo projects
-    const zenodoConfigs = projectConfigs.filter(config => config.sourceType === 'zenodo');
-    console.log('Zenodo configs:', zenodoConfigs.length, zenodoConfigs);
-    
-    zenodoConfigs.forEach(config => {
-      const match = config.sourceUrl.match(/zenodo\.org\/records?\/(\d+)/);
-      if (match) {
-        const recordId = match[1];
-        console.log('Looking for Zenodo record ID:', recordId);
-        console.log('Available Zenodo records:', zenodoRecords.map(r => r.id));
-        const record = getZenodoRecordById(recordId);
-        if (record) {
-          console.log('Found Zenodo record:', record.metadata.title);
-          processedProjects.push(processZenodoProject(record, config));
+    // Process projects from configuration
+    config.openSourceProjects.forEach(projectConfig => {
+      if (projectConfig.sourceType === 'github') {
+        const repo = getGitHubRepoByUrl(projectConfig.sourceUrl);
+        if (repo) {
+          console.log('Found GitHub repo:', repo.name);
+          processedProjects.push(processGitHubProject(repo, projectConfig));
         } else {
-          console.warn('Zenodo record not found for ID:', recordId);
+          console.warn('GitHub repo not found for:', projectConfig.sourceUrl);
         }
-      } else {
-        console.warn('Invalid Zenodo URL:', config.sourceUrl);
+      } else if (projectConfig.sourceType === 'zenodo') {
+        const match = projectConfig.sourceUrl.match(/zenodo\.org\/records?\/(\d+)/);
+        if (match) {
+          const recordId = match[1];
+          console.log('Looking for Zenodo record ID:', recordId);
+          console.log('Available Zenodo records:', zenodoRecords.map(r => r.id));
+          const record = getZenodoRecordById(recordId);
+          if (record) {
+            console.log('Found Zenodo record:', record.metadata.title);
+            processedProjects.push(processZenodoProject(record, projectConfig));
+          } else {
+            console.warn('Zenodo record not found for ID:', recordId);
+          }
+        } else {
+          console.warn('Invalid Zenodo URL:', projectConfig.sourceUrl);
+        }
       }
     });
 
     console.log('Final processed projects:', processedProjects.length, processedProjects);
     setProjects(processedProjects);
-  }, [githubRepos, zenodoRecords, loading, getGitHubRepoByUrl, getZenodoRecordById, error]);
+  }, [config, githubRepos, zenodoRecords, loading, getGitHubRepoByUrl, getZenodoRecordById, error]);
 
   const categories = [
     { id: 'all', name: 'All Projects', count: projects.length },

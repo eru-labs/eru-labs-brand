@@ -1,0 +1,66 @@
+{
+  "metadata": {
+    "siteName": "ERU Labs",
+    "description": "Advanced AI research lab focused on emergent behaviors and multi-agent systems",
+    "version": "1.0.0"
+  },
+  "hero": {
+    "featuredPublication": {
+      "zenodoUrl": "https://zenodo.org/records/15724141",
+      "title": "This is Your AI on Peer Pressure: An Observational Study of Inter-Agent Social Dynamics"
+    }
+  },
+  "github": {
+    "repositories": [
+      "https://github.com/im-knots/ea-monorepo",
+      "https://github.com/im-knots/the-academy",
+      "https://github.com/im-knots/gvft"
+    ]
+  },
+  "zenodo": {
+    "recordIds": [
+      "15724141"
+    ]
+  },
+  "publications": {
+    "zenodoIds": [
+      "15724141"
+    ],
+    "featuredIds": [
+      "15724141"
+    ]
+  },
+  "openSourceProjects": [
+    {
+      "sourceUrl": "https://github.com/im-knots/the-academy",
+      "sourceType": "github",
+      "category": "infrastructure",
+      "featured": true,
+      "icon": "GraduationCap",
+      "customDescription": "Research platform for studying multi-agent AI interactions and peer pressure dynamics"
+    },
+    {
+      "sourceUrl": "https://github.com/im-knots/ea-monorepo",
+      "sourceType": "github",
+      "category": "infrastructure",
+      "icon": "Cpu",
+      "customDescription": "Modular AI orchestration platform for building complex agent-based workflows",
+      "docsUrl": "#docs"
+    },
+    {
+      "sourceUrl": "https://github.com/im-knots/gvft",
+      "sourceType": "github",
+      "category": "framework",
+      "icon": "Brain",
+      "customDescription": "Gestalt Vector Field Theory - Novel framework for evolving neural architectures using field theoretic concepts"
+    },
+    {
+      "sourceUrl": "https://zenodo.org/records/15724141",
+      "sourceType": "zenodo",
+      "category": "research",
+      "icon": "BotMessageSquare",
+      "customDescription": "This is Your AI on Peer Pressure: An Observational Study of Inter-Agent Social Dynamics",
+      "githubUrl": "https://github.com/im-knots/the-academy"
+    }
+  ]
+}

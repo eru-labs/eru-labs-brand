@@ -7,17 +7,11 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useERULabsData } from '../providers/data-provider';
 
-// Define your Zenodo record IDs here
-const ZENODO_IDS = [
-  '15724141',
-];
-
 interface Publication {
   id: string;
   title: string;
   authors: string[];
   date: string;
-  abstract: string;
   downloads: number;
   tags: string[];
   zenodoUrl: string;
@@ -28,19 +22,20 @@ interface Publication {
 
 export default function Publications() {
   const [publications, setPublications] = useState<Publication[]>([]);
-  const { zenodoRecords, loading, error } = useERULabsData();
+  const { config, zenodoRecords, loading, error } = useERULabsData();
 
   useEffect(() => {
-    if (loading || zenodoRecords.length === 0) return;
+    if (loading || zenodoRecords.length === 0 || !config) return;
 
     console.log('Publications - Processing Zenodo records:', {
       loading,
       zenodoRecordsCount: zenodoRecords.length,
       zenodoRecords: zenodoRecords.map(r => ({ id: r.id, title: r.metadata?.title })),
-      ZENODO_IDS
+      configZenodoIds: config.publications.zenodoIds,
+      featuredIds: config.publications.featuredIds
     });
 
-    const transformedPublications: Publication[] = ZENODO_IDS.map((id, index) => {
+    const transformedPublications: Publication[] = config.publications.zenodoIds.map((id, index) => {
       console.log('Publications - Looking for record with ID:', id, 'Type:', typeof id);
       const record = zenodoRecords.find(r => {
         const match = r.id === id || r.id === parseInt(id).toString() || r.id.toString() === id;
@@ -60,24 +55,26 @@ export default function Publications() {
         file.type === 'pdf' || file.key.toLowerCase().includes('.pdf')
       );
       
+      // Check if this publication is featured
+      const isFeatured = config.publications.featuredIds.includes(id);
+      
       return {
         id: record.id,
         title: record.metadata.title,
         authors: record.metadata.creators.map(creator => creator.name),
         date: new Date(record.metadata.publication_date).getFullYear().toString(),
-        abstract: record.metadata.description.replace(/<[^>]*>/g, '').substring(0, 300) + '...',
         downloads: record.stats.downloads,
         tags: record.metadata.keywords || [],
         zenodoUrl: record.links.self_html,
         pdfUrl: pdfFile ? pdfFile.links.self : record.links.self_html,
         doi: record.metadata.doi,
-        featured: index === 0, // Mark first publication as featured
+        featured: isFeatured,
       };
     }).filter(Boolean) as Publication[];
 
     console.log('Publications - Final publications:', transformedPublications.length, transformedPublications);
     setPublications(transformedPublications);
-  }, [zenodoRecords, loading]);
+  }, [config, zenodoRecords, loading]);
 
   if (loading) {
     return (
@@ -107,7 +104,7 @@ export default function Publications() {
               Error loading publications: {error}
             </div>
             <p className="text-gray-500 mt-2">
-              Please check the Zenodo IDs and try again.
+              Please check the configuration and try again.
             </p>
           </div>
         </div>
@@ -116,7 +113,7 @@ export default function Publications() {
   }
 
   return (
-    <section id="publications" className="py-20 bg-gray-950">
+    <section className="py-20 bg-gray-950">
       <div className="container mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -136,7 +133,7 @@ export default function Publications() {
 
         {publications.length === 0 ? (
           <div className="text-center text-gray-400">
-            <p>No publications found. Please add Zenodo IDs to display publications.</p>
+            <p>No publications found. Please add Zenodo IDs to the configuration to display publications.</p>
           </div>
         ) : (
           <div className="space-y-8">
