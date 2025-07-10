@@ -1,46 +1,20 @@
-name: Build & Push
+name: Build & Push Brand Service
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'brand/**'
+      - '!brand/**/*.md'  # Exclude markdown files
 
 permissions:
   contents: write
   id-token: write
 
 jobs:
-  detect-changes:
-    runs-on: ubuntu-latest
-    outputs:
-      services: ${{ steps.filter.outputs.changes }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      # theres got to be a cleaner way to do this but this is the best i could figure out
-      - name: Detect changed services
-        id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          list-files: 'json'
-          predicate-quantifier: 'every'
-          filters: |
-            brand: 
-              - 'brand/**'
-              - '!/**/*.md'
-
-
   build-and-push:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.changes != '[]'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        service: ${{ fromJson(needs.detect-changes.outputs.services) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -56,45 +30,39 @@ jobs:
         run: |
           gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
-      - name: Docker build and push
+      - name: Set environment variables
         run: |
           DATE_TAG=$(date '+%Y%m%d')
           GIT_COMMIT_TAG=$(git rev-parse --short HEAD)
-          SERVICE=$(basename "${{ matrix.service }}")
           IMAGE_VERSION="${DATE_TAG}-${GIT_COMMIT_TAG}"
-          IMAGE_BASE="us-central1-docker.pkg.dev/eru-labs-mgmt/eru-labs-images/${SERVICE}"
+          IMAGE_BASE="us-central1-docker.pkg.dev/eru-labs-mgmt/eru-labs-images/brand"
+          
+          echo "IMAGE_VERSION=${IMAGE_VERSION}" >> "$GITHUB_ENV"
+          echo "IMAGE_BASE=${IMAGE_BASE}" >> "$GITHUB_ENV"
 
-          docker build -t ${IMAGE_BASE}:${IMAGE_VERSION} -t ${IMAGE_BASE}:latest ${{ matrix.service }}
+      - name: Docker build and push
+        working-directory: brand
+        run: |
+          docker build -t ${IMAGE_BASE}:${IMAGE_VERSION} -t ${IMAGE_BASE}:latest .
           docker push ${IMAGE_BASE}:${IMAGE_VERSION}
           docker push ${IMAGE_BASE}:latest
 
-          echo "SERVICE=${SERVICE}" >> "$GITHUB_ENV"
-          echo "IMAGE_VERSION=${IMAGE_VERSION}" >> "$GITHUB_ENV"
-
-      - name: Build and Push Helm Chart (if present)
+      - name: Package and Push Helm Chart
+        working-directory: brand
         run: |
-          CHART_DIR="${{ matrix.service }}/chart"
           CHART_REGISTRY="us-central1-docker.pkg.dev/eru-labs-mgmt/eru-labs-images"
-          IMAGE_VERSION="${{ env.IMAGE_VERSION }}"
-          SERVICE_NAME=$(basename "${{ matrix.service }}")
-
-          if [ -d "$CHART_DIR" ]; then
-            echo "Found Helm chart in $CHART_DIR. Updating version and pushing..."
-
-            # Update Chart.yaml version and appVersion to match the image version
-            sed -i "s/^version: .*/version: $IMAGE_VERSION/" $CHART_DIR/Chart.yaml
-            sed -i "s/^appVersion: .*/appVersion: $IMAGE_VERSION/" $CHART_DIR/Chart.yaml
-
-            # Package and push the chart with the modified name
-            helm package --destination . $CHART_DIR
-            CHART_PACKAGE=$(ls *.tgz)
-            helm push $CHART_PACKAGE oci://$CHART_REGISTRY
-          else
-            echo "No Helm chart found in $CHART_DIR, skipping..."
-          fi
+          
+          # Update Chart.yaml version and appVersion
+          sed -i "s/^version: .*/version: $IMAGE_VERSION/" chart/Chart.yaml
+          sed -i "s/^appVersion: .*/appVersion: $IMAGE_VERSION/" chart/Chart.yaml
+          
+          # Package and push the chart
+          helm package chart/
+          CHART_PACKAGE=$(ls brand-*.tgz)
+          helm push $CHART_PACKAGE oci://$CHART_REGISTRY
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: "${{ env.SERVICE }}-${{ env.IMAGE_VERSION }}"
-          name: "${{ env.SERVICE }} Release - ${{ env.IMAGE_VERSION }}"
+          tag_name: "brand-${{ env.IMAGE_VERSION }}"
+          name: "Brand Release - ${{ env.IMAGE_VERSION }}"
