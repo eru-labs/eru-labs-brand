@@ -225,13 +225,13 @@ export default function Publications() {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="text-center mt-12"
         >
-          <Link
+          {/* <Link
             href="/research"
             className="inline-flex items-center gap-2 text-green-500 hover:text-green-400 transition-colors"
           >
             View all publications
             <ExternalLink size={16} />
-          </Link>
+          </Link> */}
         </motion.div>
       </div>
     </section>
