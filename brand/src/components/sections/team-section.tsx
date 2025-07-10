@@ -88,7 +88,7 @@ const TeamSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Meet Our Research Team
+            Meet Our Team
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Passionate hackers, researchers and engineers working at the intersection of 
@@ -150,9 +150,9 @@ const TeamSection = () => {
         <div className="mt-16 text-center">
           <div className="inline-flex items-center justify-center p-4 bg-indigo-50 rounded-xl">
             <p className="text-gray-700">
-              Interested in joining our team? 
+              Interested in joining the collective? 
               <a href="#careers" className="ml-2 text-indigo-600 font-semibold hover:text-indigo-700 transition-colors">
-                View open positions →
+                We need you →
               </a>
             </p>
           </div>

@@ -1,8 +1,8 @@
-// File: components/OpenSourceProjects.tsx
+// File: components/sections/open-source-projects.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Github, Star, GitFork, ExternalLink, Code, Users, Zap, Brain, AlertCircle, Calendar, RefreshCw, BotMessageSquare } from 'lucide-react';
+import { Github, Star, GitFork, ExternalLink, Code, Users, Zap, Brain, AlertCircle, Calendar, RefreshCw, Download, FileText } from 'lucide-react';
 
 interface GitHubRepo {
   id: number;
@@ -19,8 +19,42 @@ interface GitHubRepo {
   homepage?: string;
 }
 
+interface ZenodoRecord {
+  id: string;
+  metadata: {
+    title: string;
+    creators: Array<{ name: string }>;
+    publication_date: string;
+    description: string;
+    keywords?: string[];
+    doi: string;
+    resource_type: {
+      title: string;
+      type: string;
+    };
+  };
+  stats: {
+    downloads: number;
+    views: number;
+  };
+  links: {
+    self_html: string;
+    files?: string;
+  };
+  files?: Array<{
+    key: string;
+    links: {
+      self: string;
+    };
+    type: string;
+    size: number;
+  }>;
+}
+
 interface ProjectConfig {
-  githubUrl: string;
+  // Can be either GitHub URL or Zenodo URL
+  sourceUrl: string;
+  sourceType: 'github' | 'zenodo';
   category: 'research' | 'framework' | 'tools' | 'infrastructure';
   featured?: boolean;
   customDescription?: string;
@@ -28,19 +62,41 @@ interface ProjectConfig {
   demoUrl?: string;
   paperUrl?: string;
   docsUrl?: string;
+  githubUrl?: string; // For Zenodo records that also have GitHub repos
 }
 
-interface ProcessedProject extends GitHubRepo {
+interface ProcessedProject {
+  id: string;
+  name: string;
+  description: string;
+  sourceType: 'github' | 'zenodo';
   category: string;
   featured: boolean;
   icon: React.ComponentType<any>;
-  languageColor: string;
+  languageColor?: string;
   customDescription?: string;
+  updated_at: string;
+  
+  // GitHub-specific fields
+  stargazers_count?: number;
+  forks_count?: number;
+  language?: string;
+  topics?: string[];
+  
+  // Zenodo-specific fields
+  downloads?: number;
+  views?: number;
+  authors?: string[];
+  doi?: string;
+  resourceType?: string;
+  
   links: {
-    github: string;
+    source: string; // Main source URL (GitHub or Zenodo)
+    github?: string;
     demo?: string;
     paper?: string;
     docs?: string;
+    download?: string; // For Zenodo PDF downloads
   };
 }
 
@@ -71,14 +127,101 @@ const categoryIcons = {
   infrastructure: Code,
 };
 
-const useGitHubProjects = (projectConfigs: ProjectConfig[]) => {
+const useMultiSourceProjects = (projectConfigs: ProjectConfig[]) => {
   const [projects, setProjects] = useState<ProcessedProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastFetch, setLastFetch] = useState<number | null>(null);
 
-  const CACHE_KEY = 'eru-labs-github-projects';
+  const CACHE_KEY = 'eru-labs-projects-v2'; // Updated version to clear old cache
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+  const fetchGitHubRepos = async (urls: string[]): Promise<GitHubRepo[]> => {
+    const repoUrls = urls.join(',');
+    console.log('Fetching GitHub data via API route...');
+    
+    // Use your existing API route to avoid CORS issues
+    const response = await fetch(`/api/github-projects?repos=${encodeURIComponent(repoUrls)}`);
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.details || `API error: ${response.statusText}`);
+    }
+
+    return response.json();
+  };
+
+  const fetchZenodoRecord = async (url: string): Promise<ZenodoRecord> => {
+    const match = url.match(/zenodo\.org\/records?\/(\d+)/);
+    if (!match) throw new Error(`Invalid Zenodo URL: ${url}`);
+    
+    const recordId = match[1];
+    const response = await fetch(`https://zenodo.org/api/records/${recordId}`);
+    if (!response.ok) throw new Error(`Zenodo API error: ${response.statusText}`);
+    
+    return response.json();
+  };
+
+  const processGitHubProject = (repo: GitHubRepo, config: ProjectConfig): ProcessedProject => {
+    const pdfFile = undefined; // GitHub repos don't have direct PDF files in this context
+    
+    return {
+      id: repo.id.toString(),
+      name: repo.name,
+      description: config.customDescription || repo.description || 'No description available',
+      sourceType: 'github',
+      category: config.category,
+      featured: config.featured || false,
+      icon: config.icon || categoryIcons[config.category], // Don't cache this
+      languageColor: languageColors[repo.language] || '#6B7280',
+      customDescription: config.customDescription,
+      updated_at: repo.updated_at,
+      stargazers_count: repo.stargazers_count,
+      forks_count: repo.forks_count,
+      language: repo.language,
+      topics: repo.topics,
+      links: {
+        source: repo.html_url,
+        github: repo.html_url,
+        ...(config.demoUrl && { demo: config.demoUrl }),
+        ...(config.paperUrl && { paper: config.paperUrl }),
+        ...(config.docsUrl && { docs: config.docsUrl }),
+        ...(repo.homepage && { demo: repo.homepage }),
+      },
+    };
+  };
+
+  const processZenodoProject = (record: ZenodoRecord, config: ProjectConfig): ProcessedProject => {
+    // Find PDF file for download
+    const pdfFile = record.files?.find(file => 
+      file.type === 'pdf' || file.key.toLowerCase().includes('.pdf')
+    );
+    
+    return {
+      id: record.id,
+      name: record.metadata.title,
+      description: config.customDescription || '', // Only show custom description for Zenodo
+      sourceType: 'zenodo',
+      category: config.category,
+      featured: config.featured || false,
+      icon: config.icon || categoryIcons[config.category],
+      customDescription: config.customDescription,
+      updated_at: record.metadata.publication_date,
+      downloads: record.stats.downloads,
+      views: record.stats.views,
+      authors: record.metadata.creators.map(creator => creator.name),
+      doi: record.metadata.doi,
+      resourceType: record.metadata.resource_type.title,
+      links: {
+        source: record.links.self_html,
+        paper: record.links.self_html,
+        ...(config.githubUrl && { github: config.githubUrl }),
+        ...(config.demoUrl && { demo: config.demoUrl }),
+        ...(config.docsUrl && { docs: config.docsUrl }),
+        ...(pdfFile && { download: pdfFile.links.self }),
+      },
+    };
+  };
 
   const fetchProjects = async (forceRefresh = false) => {
     if (projectConfigs.length === 0) {
@@ -93,8 +236,31 @@ const useGitHubProjects = (projectConfigs: ProjectConfig[]) => {
         if (cached) {
           const { data, timestamp } = JSON.parse(cached);
           if (Date.now() - timestamp < CACHE_DURATION) {
-            console.log('Using cached GitHub data');
-            setProjects(data);
+            console.log('Using cached project data');
+            
+            // Restore icons from configs since they can't be cached
+            const restoredProjects = data.map((cachedProject: any) => {
+              const config = projectConfigs.find(c => {
+                if (c.sourceType === 'github') {
+                  // For GitHub, match by repository name or URL
+                  return c.sourceUrl.includes(cachedProject.name) || 
+                         cachedProject.id === c.sourceUrl.split('/').pop();
+                } else if (c.sourceType === 'zenodo') {
+                  // For Zenodo, match by record ID
+                  return c.sourceUrl.includes(cachedProject.id);
+                }
+                return false;
+              });
+              
+              return {
+                ...cachedProject,
+                icon: config?.icon || categoryIcons[cachedProject.category],
+                // Also restore description to ensure zenodo projects have empty descriptions
+                description: config?.sourceType === 'zenodo' ? '' : cachedProject.description
+              };
+            });
+            
+            setProjects(restoredProjects);
             setLastFetch(timestamp);
             setLoading(false);
             return;
@@ -109,60 +275,73 @@ const useGitHubProjects = (projectConfigs: ProjectConfig[]) => {
     setError(null);
 
     try {
-      const repoUrls = projectConfigs.map(config => config.githubUrl).join(',');
+      console.log('Fetching fresh project data...');
       
-      console.log('Fetching fresh GitHub data...');
+      // Separate GitHub and Zenodo configs
+      const githubConfigs = projectConfigs.filter(config => config.sourceType === 'github');
+      const zenodoConfigs = projectConfigs.filter(config => config.sourceType === 'zenodo');
       
-      // Fetch from our API route instead of GitHub directly
-      const response = await fetch(`/api/github-projects?repos=${encodeURIComponent(repoUrls)}`);
+      const processedProjects: ProcessedProject[] = [];
       
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.details || `API error: ${response.statusText}`);
-      }
-
-      const githubRepos: GitHubRepo[] = await response.json();
-
-      // Merge GitHub data with our project configs
-      const processedProjects: ProcessedProject[] = githubRepos.map((repo) => {
-        // Find matching config by comparing GitHub URLs
-        const config = projectConfigs.find(c => 
-          c.githubUrl.includes(repo.full_name) || 
-          repo.html_url.includes(c.githubUrl.split('/').slice(-2).join('/'))
-        );
-        
-        if (!config) {
-          console.warn(`No config found for repo: ${repo.full_name}`);
-          return null;
+      // Fetch GitHub projects in batch through API route
+      if (githubConfigs.length > 0) {
+        try {
+          const githubUrls = githubConfigs.map(config => config.sourceUrl);
+          const githubRepos = await fetchGitHubRepos(githubUrls);
+          
+          // Process GitHub projects
+          githubRepos.forEach((repo) => {
+            // Find matching config by comparing GitHub URLs
+            const config = githubConfigs.find(c => 
+              c.sourceUrl.includes(repo.full_name) || 
+              repo.html_url.includes(c.sourceUrl.split('/').slice(-2).join('/'))
+            );
+            
+            if (config) {
+              processedProjects.push(processGitHubProject(repo, config));
+            } else {
+              console.warn(`No config found for repo: ${repo.full_name}`);
+            }
+          });
+        } catch (err) {
+          console.error('Failed to fetch GitHub projects:', err);
+          // Continue with Zenodo projects even if GitHub fails
         }
+      }
+      
+      // Fetch Zenodo projects individually
+      if (zenodoConfigs.length > 0) {
+        const zenodoPromises = zenodoConfigs.map(async (config) => {
+          try {
+            const record = await fetchZenodoRecord(config.sourceUrl);
+            return processZenodoProject(record, config);
+          } catch (err) {
+            console.error(`Failed to fetch Zenodo project ${config.sourceUrl}:`, err);
+            return null;
+          }
+        });
         
-        return {
-          ...repo,
-          category: config.category,
-          featured: config.featured || false,
-          icon: config.icon || categoryIcons[config.category],
-          languageColor: languageColors[repo.language] || '#6B7280',
-          customDescription: config.customDescription,
-          links: {
-            github: repo.html_url,
-            ...(config.demoUrl && { demo: config.demoUrl }),
-            ...(config.paperUrl && { paper: config.paperUrl }),
-            ...(config.docsUrl && { docs: config.docsUrl }),
-            ...(repo.homepage && { demo: repo.homepage }),
-          },
-        };
-      }).filter(Boolean) as ProcessedProject[];
+        const zenodoResults = await Promise.all(zenodoPromises);
+        zenodoResults.forEach(project => {
+          if (project) processedProjects.push(project);
+        });
+      }
 
       setProjects(processedProjects);
       
       const now = Date.now();
       setLastFetch(now);
 
-      // Cache the results
+      // Cache the results (excluding icons since they can't be serialized)
       if (typeof window !== 'undefined') {
         try {
+          const cacheableProjects = processedProjects.map(project => {
+            const { icon, ...cacheableProject } = project;
+            return cacheableProject;
+          });
+          
           localStorage.setItem(CACHE_KEY, JSON.stringify({
-            data: processedProjects,
+            data: cacheableProjects,
             timestamp: now,
           }));
         } catch (err) {
@@ -172,7 +351,7 @@ const useGitHubProjects = (projectConfigs: ProjectConfig[]) => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch projects';
       setError(errorMessage);
-      console.error('Error fetching GitHub projects:', err);
+      console.error('Error fetching projects:', err);
     } finally {
       setLoading(false);
     }
@@ -188,38 +367,42 @@ const useGitHubProjects = (projectConfigs: ProjectConfig[]) => {
 const OpenSourceProjects = () => {
   const [activeCategory, setActiveCategory] = useState('all');
 
-  // Configure your projects here - just add GitHub URLs and metadata
+  // Configure your projects here - supports both GitHub and Zenodo URLs
   const projectConfigs: ProjectConfig[] = [
     {
-      githubUrl: 'https://github.com/im-knots/the-academy',
+      sourceUrl: 'https://github.com/im-knots/the-academy',
+      sourceType: 'github',
       category: 'infrastructure',
       featured: true,
       icon: Brain,
       customDescription: 'Research platform for studying multi-agent AI interactions and peer pressure dynamics',
     },
     {
-      githubUrl: 'https://github.com/im-knots/ea-monorepo',
+      sourceUrl: 'https://github.com/im-knots/ea-monorepo',
+      sourceType: 'github',
       category: 'infrastructure',
       icon: Users,
       customDescription: 'Modular AI orchestration platform for building complex agent-based workflows',
       docsUrl: '#docs',
     },
     {
-      githubUrl: 'https://github.com/im-knots/gvft',
+      sourceUrl: 'https://github.com/im-knots/gvft',
+      sourceType: 'github',
       category: 'framework',
       icon: Brain,
       customDescription: 'Gestalt Vector Field Theory - Novel framework for evolving neural architectures using field theoretic concepts',
     },
     {
-      githubUrl: 'https://github.com/im-knots/the-academy',
+      sourceUrl: 'https://zenodo.org/records/15724141',
+      sourceType: 'zenodo',
       category: 'research',
       icon: Brain,
       customDescription: 'This is Your AI on Peer Pressure: An Observational Study of Inter-Agent Social Dynamics',
-      paperUrl: 'https://zenodo.org/records/15724141',
+      githubUrl: 'https://github.com/im-knots/the-academy', // Link to related GitHub repo
     },
   ];
 
-  const { projects, loading, error, lastFetch, refetch } = useGitHubProjects(projectConfigs);
+  const { projects, loading, error, lastFetch, refetch } = useMultiSourceProjects(projectConfigs);
 
   const categories = [
     { id: 'all', name: 'All Projects', count: projects.length },
@@ -248,7 +431,7 @@ const OpenSourceProjects = () => {
           </div>
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-32 w-32 border-b-2 border-green-400"></div>
-            <p className="text-gray-300 mt-4">Loading projects from GitHub...</p>
+            <p className="text-gray-300 mt-4">Loading projects from GitHub and Zenodo...</p>
           </div>
         </div>
       </section>
@@ -277,7 +460,14 @@ const OpenSourceProjects = () => {
               className="mt-4 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
               disabled={loading}
             >
-              {loading ? 'Retrying...' : 'Retry'}
+              {loading ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin mr-2" />
+                  Retrying...
+                </>
+              ) : (
+                'Try Again'
+              )}
             </button>
           </div>
         </div>
@@ -288,6 +478,7 @@ const OpenSourceProjects = () => {
   return (
     <section className="py-24 bg-gray-900" id="open-source">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-white mb-4">
             Open Source Projects
@@ -296,109 +487,172 @@ const OpenSourceProjects = () => {
             Contributing to the AI community with production-tested tools and 
             cutting-edge research implementations
           </p>
-          {lastFetch && (
-            <p className="text-sm text-gray-500 mt-2 flex items-center justify-center gap-2">
-              Last updated: {new Date(lastFetch).toLocaleString()}
-              <button 
-                onClick={() => refetch()}
-                className="inline-flex items-center gap-1 text-green-400 hover:text-green-300 transition-colors"
-                disabled={loading}
-              >
-                <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
-                {loading ? 'Refreshing...' : 'Refresh'}
-              </button>
-            </p>
-          )}
         </div>
 
+        {/* Stats Bar */}
+        {lastFetch && (
+          <div className="text-center mb-8">
+            <p className="text-gray-400 text-sm">
+              Last updated: {new Date(lastFetch).toLocaleString()}
+              <button 
+                onClick={() => refetch()} 
+                className="ml-2 text-green-400 hover:text-green-300 inline-flex items-center"
+                disabled={loading}
+              >
+                <RefreshCw className={`w-3 h-3 mr-1 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </button>
+            </p>
+          </div>
+        )}
+
         {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
+        <div className="flex flex-wrap justify-center gap-4 mb-12">
           {categories.map((category) => (
             <button
               key={category.id}
               onClick={() => setActiveCategory(category.id)}
-              className={`px-6 py-3 rounded-full font-medium transition-all duration-300 ${
+              className={`px-6 py-3 rounded-full font-medium transition-all duration-200 ${
                 activeCategory === category.id
-                  ? 'bg-green-600 text-white shadow-lg shadow-green-600/25'
-                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                  ? 'bg-green-500 text-white shadow-lg shadow-green-500/25'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white'
               }`}
             >
-              {category.name}
-              <span className="ml-2 text-sm opacity-75">({category.count})</span>
+              {category.name} ({category.count})
             </button>
           ))}
         </div>
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filteredProjects.map((project, index) => {
-            const Icon = project.icon;
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {filteredProjects.map((project) => {
+            const IconComponent = project.icon;
+            
             return (
               <div
                 key={project.id}
-                className={`group relative bg-gray-800 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 ${
-                  project.featured ? 'ring-2 ring-green-500 ring-offset-2 ring-offset-gray-900' : ''
+                className={`relative bg-gray-800 rounded-2xl p-8 hover:bg-gray-750 transition-all duration-300 group ${
+                  project.featured 
+                    ? 'border-2 border-green-500/60 shadow-2xl shadow-green-500/25' 
+                    : 'border border-gray-700 hover:border-gray-600'
                 }`}
-                style={{
-                  animation: `slideIn 0.6s ease-out ${index * 0.1}s both`
-                }}
+                style={project.featured ? {
+                  boxShadow: '0 0 20px rgba(34, 197, 94, 0.3), 0 0 40px rgba(34, 197, 94, 0.1)'
+                } : {}}
               >
-                {project.featured && (
-                  <div className="absolute top-4 right-4 z-10">
-                    <span className="px-3 py-1 bg-green-600 text-white text-xs font-semibold rounded-full">
+                {/* Project Header */}
+                <div className="flex items-start justify-between mb-6">
+                  <div className="flex items-center space-x-4">
+                    <div className={`p-3 rounded-xl ${
+                      project.featured ? 'bg-green-500/20' : 'bg-gray-700'
+                    }`}>
+                      <IconComponent className={`w-6 h-6 ${
+                        project.featured ? 'text-green-400' : 'text-gray-300'
+                      }`} />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-white">
+                        {project.name}
+                      </h3>
+                      <div className="flex items-center space-x-2 mt-1">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          project.featured 
+                            ? 'bg-green-500/20 text-green-400' 
+                            : 'bg-gray-700 text-gray-300'
+                        }`}>
+                          {project.sourceType.toUpperCase()}
+                        </span>
+                        {project.language && (
+                          <span 
+                            className="px-2 py-1 rounded-full text-xs font-medium text-white"
+                            style={{ backgroundColor: project.languageColor }}
+                          >
+                            {project.language}
+                          </span>
+                        )}
+                        {project.resourceType && (
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-500/20 text-purple-400">
+                            {project.resourceType}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  {project.featured && (
+                    <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm font-medium">
                       Featured
                     </span>
+                  )}
+                </div>
+
+                {/* Description */}
+                {project.description && (
+                  <p className="text-gray-300 mb-6 leading-relaxed">
+                    {project.description}
+                  </p>
+                )}
+
+                {/* Project Stats */}
+                <div className="flex items-center space-x-6 mb-6">
+                  {project.sourceType === 'github' && (
+                    <>
+                      <div className="flex items-center space-x-2">
+                        <Star className="w-4 h-4 text-yellow-500" />
+                        <span className="text-gray-300 text-sm">{project.stargazers_count?.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <GitFork className="w-4 h-4 text-gray-400" />
+                        <span className="text-gray-300 text-sm">{project.forks_count?.toLocaleString()}</span>
+                      </div>
+                    </>
+                  )}
+                  {project.sourceType === 'zenodo' && (
+                    <>
+                      <div className="flex items-center space-x-2">
+                        <Download className="w-4 h-4 text-blue-500" />
+                        <span className="text-gray-300 text-sm">{project.downloads?.toLocaleString()} downloads</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <FileText className="w-4 h-4 text-gray-400" />
+                        <span className="text-gray-300 text-sm">{project.views?.toLocaleString()} views</span>
+                      </div>
+                    </>
+                  )}
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="w-4 h-4 text-green-500" />
+                    <span className="text-gray-300 text-sm">
+                      {new Date(project.updated_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Authors (for Zenodo records) */}
+                {project.authors && project.authors.length > 0 && (
+                  <div className="mb-6">
+                    <h4 className="text-sm font-medium text-gray-400 mb-2">Authors:</h4>
+                    <p className="text-gray-300 text-sm">{project.authors.join(', ')}</p>
                   </div>
                 )}
 
-                <div className="p-8">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center space-x-4">
-                      <div className="p-3 bg-gray-700 rounded-xl group-hover:bg-gray-600 transition-colors">
-                        <Icon className="w-6 h-6 text-green-400" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-semibold text-white group-hover:text-green-400 transition-colors">
-                          {project.name}
-                        </h3>
-                        <div className="flex items-center mt-1 space-x-2">
-                          {project.language && (
-                            <>
-                              <span 
-                                className="w-3 h-3 rounded-full"
-                                style={{ backgroundColor: project.languageColor }}
-                              />
-                              <span className="text-sm text-gray-400">{project.language}</span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                {/* Action Links */}
+                <div className="flex items-center space-x-3 flex-wrap gap-2">
+                  {Object.entries(project.links)
+                    .filter(([type]) => type !== 'source') // Don't show redundant source button
+                    .map(([type, link]) => {
+                    const linkConfig = {
+                      github: { icon: Github, label: 'GitHub' },
+                      demo: { icon: ExternalLink, label: 'Demo' },
+                      paper: { icon: FileText, label: 'Paper' },
+                      docs: { icon: FileText, label: 'Docs' },
+                      download: { icon: Download, label: 'Download' },
+                    };
 
-                  <p className="text-gray-300 mb-6 line-clamp-2">
-                    {project.customDescription || project.description || 'No description available'}
-                  </p>
+                    const config = linkConfig[type as keyof typeof linkConfig];
+                    if (!config) return null;
 
-                  <div className="flex items-center space-x-6 mb-6">
-                    <div className="flex items-center space-x-2">
-                      <Star className="w-4 h-4 text-yellow-500" />
-                      <span className="text-gray-300 text-sm">{project.stargazers_count.toLocaleString()}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <GitFork className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-300 text-sm">{project.forks_count.toLocaleString()}</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="w-4 h-4 text-green-500" />
-                      <span className="text-gray-300 text-sm">
-                        {new Date(project.updated_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
+                    const Icon = config.icon;
 
-                  <div className="flex items-center space-x-3 flex-wrap gap-2">
-                    {Object.entries(project.links).map(([type, link]) => (
+                    return (
                       <a
                         key={type}
                         href={link}
@@ -406,58 +660,26 @@ const OpenSourceProjects = () => {
                         rel="noopener noreferrer"
                         className="flex items-center space-x-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-all duration-200 group/link"
                       >
-                        {type === 'github' && <Github className="w-4 h-4 text-gray-300 group-hover/link:text-white" />}
-                        {type === 'demo' && <ExternalLink className="w-4 h-4 text-gray-300 group-hover/link:text-white" />}
-                        {(type === 'docs' || type === 'paper') && <Code className="w-4 h-4 text-gray-300 group-hover/link:text-white" />}
-                        <span className="text-sm text-gray-300 group-hover/link:text-white capitalize">
-                          {type}
+                        <Icon className="w-4 h-4 text-gray-300 group-hover/link:text-white" />
+                        <span className="text-gray-300 group-hover/link:text-white text-sm">
+                          {config.label}
                         </span>
                       </a>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
-
-                {/* Hover Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-r from-green-600/0 via-green-600/0 to-green-600/0 group-hover:from-green-600/10 group-hover:via-emerald-600/10 group-hover:to-teal-600/10 transition-all duration-500 pointer-events-none" />
               </div>
             );
           })}
         </div>
 
-        {/* Call to Action */}
-        <div className="mt-16 text-center">
-          <a
-            href="https://github.com/im-knots"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center space-x-3 px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-green-600/25"
-          >
-            <Github className="w-5 h-5" />
-            <span>View All Projects on GitHub</span>
-            <ExternalLink className="w-4 h-4" />
-          </a>
-        </div>
+        {/* Empty State */}
+        {filteredProjects.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-400 text-lg">No projects found in this category.</p>
+          </div>
+        )}
       </div>
-
-      <style jsx>{`
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateX(-30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        .line-clamp-2 {
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-      `}</style>
     </section>
   );
 };
