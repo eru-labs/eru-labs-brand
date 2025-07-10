@@ -177,9 +177,9 @@ export default function Hero() {
             transition={{ delay: 0.4 }}
             className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto"
           >
-            We're a small team of researchers, SREs, and hackers exploring multi-agent systems, 
-            emergent behaviors, and production-informed AI. Our work is open source 
-            and driven by curiosity.
+            We're a small collective of researchers, SREs, hackers and dreamers exploring multi-agent systems, 
+            neural architecture search, and production-informed AI. Our work is open source 
+            and driven by curiosity, ethics, and the democratization of technology.
           </motion.p>
 
           {/* Stats */}

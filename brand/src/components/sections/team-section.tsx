@@ -6,7 +6,7 @@ const TeamSection = () => {
     {
       name: "knots",
       role: "Founder",
-      bio: "Emmy Award winning Engineering Leader spear heading research and development",
+      bio: "Emmy Award winning Engineering Leader spearheading research and development",
       image: "img/knots.jpeg",
       social: {
         github: "https://github.com/im-knots",
@@ -51,6 +51,18 @@ const TeamSection = () => {
       }
     },
     {
+      name: "mobomelter",
+      role: "Contributor",
+      bio: "have mobomelter fill this out",
+      image: "img/mobomelter.jpeg",
+      social: {
+        github: "https://github.com/mobomelter",
+        linkedin: "#",
+        twitter: "#",
+        email: "mobomelter@erulabs.ai"
+      }
+    },
+    {
       name: "gavisann",
       role: "Contributor",
       bio: "have gavisann fill this out",
@@ -58,7 +70,8 @@ const TeamSection = () => {
       social: {
         github: "https://github.com/RLProteus",
         linkedin: "#",
-        twitter: "#"
+        twitter: "#",
+        email: "gavisann@erulabs.ai"
       }
     }
   ];

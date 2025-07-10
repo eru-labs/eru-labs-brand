@@ -8,28 +8,28 @@ const researchAreas = [
     icon: Brain,
     title: 'Multi-Agent Systems',
     description: 'Exploring emergent behaviors in collaborative AI systems where multiple agents work together to solve complex problems.',
-    topics: ['Agent Communication', 'Collective Intelligence', 'Consensus Mechanisms'],
+    topics: ['Agent Communication', 'Collective Intelligence', 'Consensus Mechanisms', 'Distributed Agent Architectures'],
     color: 'from-green-500 to-emerald-500',
   },
   {
     icon: Network,
     title: 'Emergent Behaviors',
     description: 'Investigating how simple rules and interactions lead to complex, unpredictable behaviors in AI systems.',
-    topics: ['Self-Organization', 'Swarm Intelligence', 'Adaptive Systems'],
+    topics: ['Self-Organization', 'Swarm Intelligence', 'Adaptive Systems', 'Peer-Pressure Dynamics'],
     color: 'from-blue-500 to-cyan-500',
   },
   {
     icon: Cpu,
     title: 'Production-Informed Research',
     description: 'Bridging the gap between theoretical AI research and real-world production systems.',
-    topics: ['Scalability', 'Reliability', 'Performance Optimization'],
+    topics: ['Scalability', 'Reliability', 'Performance Optimization', 'Multi-Agent Orchestration', 'Safety Alignment', 'Data Security'],
     color: 'from-purple-500 to-pink-500',
   },
   {
     icon: GitBranch,
     title: 'Open Source AI Tools',
     description: 'Building and maintaining open source tools that enable researchers and developers to advance AI.',
-    topics: ['EA Platform', 'Integration Frameworks', 'Research Utilities'],
+    topics: ['The Ea Platform', 'The Academy', 'GVFT Framework'],
     color: 'from-orange-500 to-red-500',
   },
 ];
@@ -50,7 +50,7 @@ export default function ResearchAreas() {
           </h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
             Our research focuses on understanding and advancing artificial intelligence 
-            through practical, open approaches.
+            through practical, ethical, open approaches.
           </p>
         </motion.div>
 
