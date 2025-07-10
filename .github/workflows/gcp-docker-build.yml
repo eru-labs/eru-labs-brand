@@ -61,8 +61,58 @@ jobs:
           CHART_PACKAGE=$(ls brand-*.tgz)
           helm push $CHART_PACKAGE oci://$CHART_REGISTRY
 
+      - name: Get previous release info
+        id: prev_release
+        run: |
+          # Get the latest release tag for this service
+          LATEST_TAG=$(git tag -l "brand-*" --sort=-version:refname | head -n1 || echo "")
+          if [ -z "$LATEST_TAG" ]; then
+            echo "No previous release found"
+            echo "PREV_TAG=" >> "$GITHUB_ENV"
+          else
+            echo "Previous release: $LATEST_TAG"
+            echo "PREV_TAG=$LATEST_TAG" >> "$GITHUB_ENV"
+          fi
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          RELEASE_TAG="brand-${{ env.IMAGE_VERSION }}"
+          
+          # Create release notes
+          cat > release_notes.md << EOF
+          ## Brand Service Release - ${{ env.IMAGE_VERSION }}
+          
+          ### 🚀 Build Information
+          - **Docker Image**: \`${IMAGE_BASE}:${{ env.IMAGE_VERSION }}\`
+          - **Helm Chart**: \`brand:${{ env.IMAGE_VERSION }}\`
+          - **Git Commit**: \`$(git rev-parse HEAD)\`
+          - **Build Date**: \`$(date -u '+%Y-%m-%d %H:%M:%S UTC')\`
+          
+          ### 📦 Artifacts
+          - Docker image pushed to Artifact Registry
+          - Helm chart packaged and pushed to OCI registry
+          
+          EOF
+          
+          # Add commit history if we have a previous release
+          if [ -n "${{ env.PREV_TAG }}" ]; then
+            echo "### 📝 Changes since ${{ env.PREV_TAG }}" >> release_notes.md
+            echo "" >> release_notes.md
+            git log --oneline --no-merges ${{ env.PREV_TAG }}..HEAD -- brand/ >> release_notes.md || true
+          else
+            echo "### 📝 Initial Release" >> release_notes.md
+            echo "This is the first release of the brand service." >> release_notes.md
+          fi
+          
+          echo "RELEASE_NOTES_FILE=release_notes.md" >> "$GITHUB_ENV"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: "brand-${{ env.IMAGE_VERSION }}"
-          name: "Brand Release - ${{ env.IMAGE_VERSION }}"
+          name: "Brand Service - ${{ env.IMAGE_VERSION }}"
+          body_path: release_notes.md
+          generate_release_notes: false
+          draft: false
+          prerelease: false
