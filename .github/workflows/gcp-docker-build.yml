@@ -19,16 +19,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - id: auth
-        name: Authenticate to Google Cloud
+      - name: Authenticate to Google Cloud
+        id: auth
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: 'projects/115597884357/locations/global/workloadIdentityPools/actions-pool/providers/github-provider'
           service_account: 'github-actions@eru-labs-mgmt.iam.gserviceaccount.com'
+          token_format: 'access_token'
 
-      - name: Configure Artifact Registry Auth
+      - name: Configure Docker for Artifact Registry
         run: |
-          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          echo '${{ steps.auth.outputs.access_token }}' | docker login -u oauth2accesstoken --password-stdin us-central1-docker.pkg.dev
+
+      - name: Verify authentication
+        run: |
+          gcloud auth list
+          gcloud config list
 
       - name: Set environment variables
         run: |
