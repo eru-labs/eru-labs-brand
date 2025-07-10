@@ -135,7 +135,7 @@ export default function Hero() {
             className="flex flex-wrap gap-4 justify-center"
           >
             <Link
-              href="/research"
+              href="#publications"
               className="group flex items-center gap-2 px-6 py-3 bg-green-500 text-black font-semibold rounded-lg hover:bg-green-400 transition-colors"
             >
               <FileText size={20} />
@@ -144,7 +144,7 @@ export default function Hero() {
             </Link>
             
             <Link
-              href="https://github.com/im-knots"
+              href="https://github.com/eru-labs"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 px-6 py-3 border border-gray-700 text-white font-semibold rounded-lg hover:border-green-500 hover:text-green-500 transition-colors"
