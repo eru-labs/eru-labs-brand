@@ -1,9 +1,9 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ include "eru-brand.fullname" . }}-pdb
+  name: {{ include "brand.fullname" . }}-pdb
   labels:
-    app: {{ include "eru-brand.name" . }}
+    app: {{ include "brand.name" . }}
 spec:
   minAvailable: 
     {{- if .Values.pdb.minAvailable }}
@@ -19,4 +19,4 @@ spec:
     {{- end }}
   selector:
     matchLabels:
-      {{- include "eru-brand.selectorLabels" . | nindent 6 }}
+      {{- include "brand.selectorLabels" . | nindent 6 }}

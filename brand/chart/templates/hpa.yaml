@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "eru-brand.fullname" . }}
+  name: {{ include "brand.fullname" . }}
   labels:
-    {{- include "eru-brand.labels" . | nindent 4 }}
+    {{- include "brand.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "eru-brand.fullname" . }}
+    name: {{ include "brand.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:
