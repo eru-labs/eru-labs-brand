@@ -65,12 +65,12 @@
   ],
   "team": {
     "title": "Meet Our Team",
-    "description": "Passionate hackers, researchers and engineers working at the intersection of multi-agent systems, AI orchestration, and emergent behaviors",
+    "description": "Passionate hackers, researchers, creatives and engineers working at the intersection of multi-agent systems, AI orchestration, and human-machine interaction",
     "members": [
       {
         "name": "knots",
         "role": "Founder",
-        "bio": "Emmy Award winning Engineering Leader spearheading research and development",
+        "bio": "Emmy Award winning Engineering Leader by day. Spearheading research and development in my free time.",
         "image": "img/knots.jpeg",
         "social": {
           "github": "https://github.com/im-knots",
@@ -129,19 +129,31 @@
       {
         "name": "sesquisentient",
         "role": "Contributor",
-        "bio": "have ses fill this out",
+        "bio": "Metaphysical alignment specialist",
         "image": "img/sesquisentient.png",
         "social": {
-          "github": "#",
+          "github": "https://github.com/sesquisentient",
           "linkedin": "#",
           "twitter": "#",
           "email": "sesquisentient@erulabs.ai"
         }
       },
       {
+        "name": "ngwnn",
+        "role": "Contributor",
+        "bio": "Likes to mess around with split keyboards, Linux based servers, and videogames when he's got any modicum of time on his hands. Elsewise, works in the IT field",
+        "image": "img/ngwnn.jpeg",
+        "social": {
+          "github": "https://github.com/JoeArcher007",
+          "linkedin": "#",
+          "twitter": "#",
+          "email": "ngwnn@erulabs.ai"
+        }
+      },
+      {
         "name": "gavisann",
         "role": "Contributor",
-        "bio": "have gavisann fill this out",
+        "bio": "Hands-on Site Reliability Engineering leader who champions high-impact initiatives to build successful SRE organizations",
         "image": "img/gavisann.jpeg",
         "social": {
           "github": "https://github.com/RLProteus",
@@ -149,7 +161,20 @@
           "twitter": "#",
           "email": "gavisann@erulabs.ai"
         }
+      },
+      {
+        "name": "echs",
+        "role": "Contributor",
+        "bio": "",
+        "image": "img/echs.png",
+        "social": {
+          "github": "https://github.com/bh1",
+          "linkedin": "#",
+          "twitter": "#",
+          "email": "echs@erulabs.ai"
+        }
       }
+
     ],
     "callToAction": {
       "text": "Interested in joining the collective?",

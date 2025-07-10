@@ -32,12 +32,12 @@ const Header = () => {
       href: '#team'
     },
     {
-      name: 'Blog',
-      href: '#blog'
+      name: 'Mission',
+      href: '#mission'
     },
     {
-      name: 'About',
-      href: '#about'
+      name: 'Blog',
+      href: '#blog'
     }
   ];
 

@@ -52,12 +52,12 @@ const Footer = () => {
         { name: 'Forum', href: '#forum' }
       ]
     },
-    company: {
-      title: 'Company',
+    collective: {
+      title: 'Collective',
       icon: FileText,
       links: [
         { name: 'About Us', href: '#about' },
-        { name: 'Careers', href: '#careers', badge: '3 openings' },
+        { name: 'Team', href: '#team', badge: 'Contribute Today' },
         { name: 'Contact', href: '#contact' },
         { name: 'Privacy Policy', href: '#privacy' }
       ]
