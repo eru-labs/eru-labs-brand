@@ -154,7 +154,7 @@ export default function Hero() {
             </Link>
 
             <Link
-              href="#collaborate"
+              href="https://github.com/eru-labs/welcome"
               className="flex items-center gap-2 px-6 py-3 border border-gray-700 text-white font-semibold rounded-lg hover:border-green-500 hover:text-green-500 transition-colors"
             >
               <Users size={20} />

@@ -14,7 +14,8 @@
     "repositories": [
       "https://github.com/im-knots/ea-monorepo",
       "https://github.com/im-knots/the-academy",
-      "https://github.com/im-knots/gvft"
+      "https://github.com/im-knots/gvft",
+      "https://github.com/chazapp/o11y"
     ]
   },
   "zenodo": {
@@ -55,6 +56,13 @@
       "customDescription": "Gestalt Vector Field Theory - Novel framework for evolving neural architectures using field theoretic concepts"
     },
     {
+      "sourceUrl": "https://github.com/chazapp/o11y",
+      "sourceType": "github",
+      "category": "infrastructure",
+      "icon": "Cpu",
+      "customDescription": "A DevOps shop showcase of observability in action."
+    },
+    {
       "sourceUrl": "https://zenodo.org/records/15724141",
       "sourceType": "zenodo",
       "category": "research",
@@ -82,7 +90,7 @@
       {
         "name": "chazapp",
         "role": "Contributor",
-        "bio": "have chazapp fill this out",
+        "bio": "Prometheus Wizard, Human Alert Routing Machine, Upgrading maniac",
         "image": "img/chaz.png",
         "social": {
           "github": "https://github.com/chazapp",
@@ -105,7 +113,7 @@
       {
         "name": "nullaffinity",
         "role": "Contributor",
-        "bio": "have null fill this out",
+        "bio": "Maker and breaker of things",
         "image": "img/nullaffinity.png",
         "social": {
           "github": "https://github.com/null-affinity",
@@ -117,7 +125,7 @@
       {
         "name": "mobomelter",
         "role": "Contributor",
-        "bio": "have mobomelter fill this out",
+        "bio": "",
         "image": "img/mobomelter.jpeg",
         "social": {
           "github": "https://github.com/mobomelter",
