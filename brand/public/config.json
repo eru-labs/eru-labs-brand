@@ -179,7 +179,7 @@
     "callToAction": {
       "text": "Interested in joining the collective?",
       "linkText": "We need you →",
-      "linkUrl": "#careers"
+      "linkUrl": "https://github.com/eru-labs/welcome"
     }
   },
   "mission": {

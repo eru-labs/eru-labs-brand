@@ -18,7 +18,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-gray-900 text-gray-300">
-      {/* Newsletter Section */}
+      {/* Newsletter Section
       <div className="border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="max-w-2xl mx-auto text-center">
@@ -43,7 +43,7 @@ const Footer = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -95,9 +95,24 @@ const Footer = () => {
               >
                 info@erulabs.ai
               </a>
-              <div className="text-gray-400 text-sm">
-                #erulabs on libera IRC network
-              </div>
+              <a 
+                href="https://libera.chat/" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-green-400 transition-colors duration-200 text-sm block flex items-center"
+              >
+                #erulabs on Libera IRC Network
+                <ArrowUpRight className="w-3 h-3 ml-1" />
+              </a>
+              <a 
+                href="https://github.com/eru-labs/welcome" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-green-400 transition-colors duration-200 text-sm block flex items-center"
+              >
+                Contribute
+                <ArrowUpRight className="w-3 h-3 ml-1" />
+              </a>
               <a 
                 href="https://github.com/eru-labs" 
                 target="_blank"
