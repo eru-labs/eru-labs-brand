@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Github, Star, GitFork, ExternalLink, Code, Users, Zap, Brain, AlertCircle, Calendar, RefreshCw, Download, FileText } from 'lucide-react';
+import { Github, Star, GitFork, ExternalLink, Code, Users, Zap, Brain, AlertCircle, Calendar, RefreshCw, Download, FileText, GraduationCap, Cpu, BotMessageSquare } from 'lucide-react';
 
 interface GitHubRepo {
   id: number;
@@ -374,14 +374,14 @@ const OpenSourceProjects = () => {
       sourceType: 'github',
       category: 'infrastructure',
       featured: true,
-      icon: Brain,
+      icon: GraduationCap,
       customDescription: 'Research platform for studying multi-agent AI interactions and peer pressure dynamics',
     },
     {
       sourceUrl: 'https://github.com/im-knots/ea-monorepo',
       sourceType: 'github',
       category: 'infrastructure',
-      icon: Users,
+      icon: Cpu,
       customDescription: 'Modular AI orchestration platform for building complex agent-based workflows',
       docsUrl: '#docs',
     },
@@ -396,7 +396,7 @@ const OpenSourceProjects = () => {
       sourceUrl: 'https://zenodo.org/records/15724141',
       sourceType: 'zenodo',
       category: 'research',
-      icon: Brain,
+      icon: BotMessageSquare,
       customDescription: 'This is Your AI on Peer Pressure: An Observational Study of Inter-Agent Social Dynamics',
       githubUrl: 'https://github.com/im-knots/the-academy', // Link to related GitHub repo
     },
