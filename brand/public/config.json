@@ -77,8 +77,8 @@
     "members": [
       {
         "name": "knots",
-        "role": "Founder",
-        "bio": "Emmy Award winning Engineering Leader by day. Spearheading research and development in my free time.",
+        "role": "Contributor",
+        "bio": "Emmy Award winning engineering leader by day. Spearheading research and development in my free time.",
         "image": "img/knots.jpeg",
         "social": {
           "github": "https://github.com/im-knots",

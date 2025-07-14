@@ -7,7 +7,7 @@ const researchAreas = [
   {
     icon: Brain,
     title: 'Multi-Agent Systems',
-    description: 'Exploring emergent behaviors in collaborative AI systems where multiple agents work together to solve complex problems.',
+    description: 'Exploring collaborative AI systems where multiple agents work together to solve complex problems.',
     topics: ['Agent Communication', 'Collective Intelligence', 'Consensus Mechanisms', 'Distributed Agent Architectures'],
     color: 'from-green-500 to-emerald-500',
   },
