@@ -173,7 +173,7 @@ export default function Hero() {
               <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
                 <span className="text-green-500">Latest Publication</span>
                 <span>•</span>
-                <span>3 weeks ago</span>
+                <span>This Month</span>
               </div>
               <h3 className="text-lg font-semibold mb-2">
                 {config.hero.featuredPublication.title}

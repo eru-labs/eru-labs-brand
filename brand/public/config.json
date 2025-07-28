@@ -6,7 +6,7 @@
   },
   "hero": {
     "featuredPublication": {
-      "zenodoUrl": "https://zenodo.org/records/15724141",
+      "zenodoUrl": "https://zenodo.org/records/16334705",
       "title": "This is Your AI on Peer Pressure: An Observational Study of Inter-Agent Social Dynamics"
     }
   },
@@ -20,15 +20,15 @@
   },
   "zenodo": {
     "recordIds": [
-      "15724141"
+      "16334705"
     ]
   },
   "publications": {
     "zenodoIds": [
-      "15724141"
+      "16334705"
     ],
     "featuredIds": [
-      "15724141"
+      "16334705"
     ]
   },
   "openSourceProjects": [
@@ -63,7 +63,7 @@
       "customDescription": "A DevOps shop showcase of observability in action."
     },
     {
-      "sourceUrl": "https://zenodo.org/records/15724141",
+      "sourceUrl": "https://zenodo.org/records/16334705",
       "sourceType": "zenodo",
       "category": "research",
       "icon": "BotMessageSquare",
