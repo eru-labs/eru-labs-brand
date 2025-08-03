@@ -6,7 +6,7 @@
   },
   "hero": {
     "featuredPublication": {
-      "zenodoUrl": "https://zenodo.org/records/16733856",
+      "zenodoUrl": "https://zenodo.org/records/16733857",
       "title": "The Geometry of Conversation: Evidence from Cross-Embedding Invariance"
     }
   },
@@ -22,16 +22,16 @@
   "zenodo": {
     "recordIds": [
       "16573783",
-      "16733856"
+      "16733857"
     ]
   },
   "publications": {
     "zenodoIds": [
       "16573783",
-      "16733856"
+      "16733857"
     ],
     "featuredIds": [
-      "16733856"
+      "16733857"
     ]
   },
   "openSourceProjects": [
