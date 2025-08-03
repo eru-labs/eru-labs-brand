@@ -6,29 +6,32 @@
   },
   "hero": {
     "featuredPublication": {
-      "zenodoUrl": "https://zenodo.org/records/16573783",
-      "title": "This is Your AI on Peer Pressure: An Observational Study of Inter-Agent Social Dynamics"
+      "zenodoUrl": "https://zenodo.org/records/16733856",
+      "title": "The Geometry of Conversation: Evidence from Cross-Embedding Invariance"
     }
   },
   "github": {
     "repositories": [
       "https://github.com/im-knots/ea-monorepo",
       "https://github.com/im-knots/the-academy",
+      "https://github.com/im-knots/gcs",
       "https://github.com/im-knots/gvft",
       "https://github.com/chazapp/o11y"
     ]
   },
   "zenodo": {
     "recordIds": [
-      "16573783"
+      "16573783",
+      "16733856"
     ]
   },
   "publications": {
     "zenodoIds": [
-      "16573783"
+      "16573783",
+      "16733856"
     ],
     "featuredIds": [
-      "16573783"
+      "16733856"
     ]
   },
   "openSourceProjects": [
@@ -45,8 +48,14 @@
       "sourceType": "github",
       "category": "infrastructure",
       "icon": "Cpu",
-      "customDescription": "Modular AI orchestration platform for building complex agent-based workflows",
-      "docsUrl": "#docs"
+      "customDescription": "Modular AI orchestration platform for building complex agent-based workflows"
+    },
+    {
+      "sourceUrl": "https://github.com/im-knots/gcs",
+      "sourceType": "github",
+      "category": "framework",
+      "icon": "Brain",
+      "customDescription": "A research framework for analyzing the geometric properties of AI conversations"
     },
     {
       "sourceUrl": "https://github.com/im-knots/gvft",
