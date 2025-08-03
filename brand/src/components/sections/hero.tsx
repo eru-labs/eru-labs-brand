@@ -179,7 +179,7 @@ export default function Hero() {
                 {config.hero.featuredPublication.title}
               </h3>
               <p className="text-gray-400 text-sm">
-                  When AI agents converse, do they influence each other like humans do?
+                  Do conversations have shape?
               </p>
               <Link 
                 href={config.hero.featuredPublication.zenodoUrl}
