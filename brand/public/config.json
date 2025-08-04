@@ -6,8 +6,8 @@
   },
   "hero": {
     "featuredPublication": {
-      "zenodoUrl": "https://zenodo.org/records/16733857",
-      "title": "The Geometry of Conversation: Evidence from Cross-Embedding Invariance"
+      "zenodoUrl": "https://zenodo.org/records/16740292",
+      "title": "Just Say No to Single Embeddings: Why Your AI Needs Multiple Perspectives"
     }
   },
   "github": {
@@ -22,16 +22,16 @@
   "zenodo": {
     "recordIds": [
       "16573783",
-      "16733857"
+      "16740292"
     ]
   },
   "publications": {
     "zenodoIds": [
       "16573783",
-      "16733857"
+      "16740292"
     ],
     "featuredIds": [
-      "16733857"
+      "16740292"
     ]
   },
   "openSourceProjects": [
@@ -78,6 +78,14 @@
       "icon": "BotMessageSquare",
       "customDescription": "This is Your AI on Peer Pressure: An Observational Study of Inter-Agent Social Dynamics",
       "githubUrl": "https://github.com/im-knots/the-academy"
+    },
+    {
+      "sourceUrl": "https://zenodo.org/records/16740292",
+      "sourceType": "zenodo",
+      "category": "research",
+      "icon": "BotMessageSquare",
+      "customDescription": "Just Say No to Single Embeddings: Why Your AI Needs Multiple Perspectives",
+      "githubUrl": "https://github.com/im-knots/gcs"
     }
   ],
   "team": {
